@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "870770301822",
+    "firebase_url": "https://carmaintenancefyp-67049.firebaseio.com",
+    "project_id": "carmaintenancefyp-67049",
+    "storage_bucket": "carmaintenancefyp-67049.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870770301822:android:077b0d5a54765788",
+        "android_client_info": {
+          "package_name": "com.example.rhuarhri.carmaintenancechatbot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "870770301822-r26ulem2iehdoogt5gc69rc8ovsi3d7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMtWk-gBdt2NHvauR5muVs5v95rH40-qs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
