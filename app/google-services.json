@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "870770301822",
-    "firebase_url": "https://carmaintenancefyp-67049.firebaseio.com",
-    "project_id": "carmaintenancefyp-67049",
-    "storage_bucket": "carmaintenancefyp-67049.appspot.com"
+    "project_number": "299074968313",
+    "firebase_url": "https://car-m-fyp-database.firebaseio.com",
+    "project_id": "car-m-fyp-database",
+    "storage_bucket": "car-m-fyp-database.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:870770301822:android:077b0d5a54765788",
+        "mobilesdk_app_id": "1:299074968313:android:077b0d5a54765788",
         "android_client_info": {
           "package_name": "com.example.rhuarhri.carmaintenancechatbot"
         }
       },
       "oauth_client": [
         {
-          "client_id": "870770301822-r26ulem2iehdoogt5gc69rc8ovsi3d7g.apps.googleusercontent.com",
+          "client_id": "299074968313-a5s69ch52jv2f5hjs8cvie5ksoosrf0o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCMtWk-gBdt2NHvauR5muVs5v95rH40-qs"
+          "current_key": "AIzaSyAJpBXgqg3ydi_mSeev4QEPMwveWUx03tM"
         }
       ],
       "services": {
