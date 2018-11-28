@@ -22,6 +22,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+
 /*
 import com.crashlytics.android.answers.FirebaseAnalyticsEventMapper;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     EditText userResponseET;
     Button sendUserResponseBTN;
     TextView outputTXT;
-    FirebaseFirestore db;
+
+    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(keyWordSearch.class).build();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,15 +45,60 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         outputTXT = (TextView) findViewById(R.id.outputTXT);
-        /* Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
 
-        myRef.setValue("Hello, World!");*/
 
-        //fire store
-        db = FirebaseFirestore.getInstance();
+        userResponseET = (EditText) findViewById(R.id.userResponseET);
+        sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
 
+
+
+        sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                WorkManager threadManager = WorkManager.getInstance();
+
+                threadManager.enqueue(wordSearch);
+
+
+            }
+        });
+    }
+}
+
+
+//CollectionReference citiesRef = db.collection("users");
+/*
+                db.collection("users").whereEqualTo("born", 1815).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        outputTXT.setText("Data " + document.get("first"));
+                                    }
+                                } else {
+                                    outputTXT.setText("No data found");
+                                }
+                            }
+                        });*/
+
+                /*db.collection("users")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        outputTXT.setText("Data " + document.getId() + " " + document.getData());
+                                    }
+                                } else {
+                                    outputTXT.setText("No data found");
+                                }
+                            }
+                        });*/
+
+/*
         // Create a new user with a first and last name
         Map<String, Object> user = new HashMap<>();
         user.put("first", "Ada");
@@ -66,50 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 outputTXT.setText("unable to send");
             }
         });
+*/
 
 
 
-
-        userResponseET = (EditText) findViewById(R.id.userResponseET);
-        sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
-
-        sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                //CollectionReference citiesRef = db.collection("users");
-
-                db.collection("users").whereEqualTo("born", 1815).get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        outputTXT.setText("Data " + document.get("first"));
-                                    }
-                                } else {
-                                    outputTXT.setText("No data found");
-                                }
-                            }
-                        });
-
-                /*db.collection("users")
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        outputTXT.setText("Data " + document.getId() + " " + document.getData());
-                                    }
-                                } else {
-                                    outputTXT.setText("No data found");
-                                }
-                            }
-                        });*/
-
-
-            }
-        });
-    }
-}

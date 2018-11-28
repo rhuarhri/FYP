@@ -1,14 +1,34 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class keyWordSearch {
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
+public class keyWordSearch extends Worker {
+
+    public keyWordSearch(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
+    @NonNull
+    @Override
+    public Result doWork() {
+
+
+
+        return null;
+    }
 
     List ofCharacters = new ArrayList<String>();
     List blackList = new ArrayList<String>();
     List whiteList = new ArrayList<String>();
 
+    /*
     keyWordSearch()
     {
         ofCharacters.add("?");
@@ -20,7 +40,7 @@ public class keyWordSearch {
         blackList.add("the");
 
         whiteList.add("gear");
-    }
+    }*/
 
 
 
