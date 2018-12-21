@@ -1,5 +1,6 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,10 +20,13 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 /*
@@ -36,7 +40,15 @@ public class MainActivity extends AppCompatActivity {
     Button sendUserResponseBTN;
     TextView outputTXT;
 
-    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(keyWordSearch.class).build();
+    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(whiteListInterface.class).build();
+
+
+    String Testresults = "a";
+
+    StringBuilder fields = new StringBuilder("");
+
+
+
 
 
     @Override
@@ -50,6 +62,27 @@ public class MainActivity extends AppCompatActivity {
         userResponseET = (EditText) findViewById(R.id.userResponseET);
         sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
 
+        WorkManager.getInstance().getWorkInfoByIdLiveData(wordSearch.getId())
+                .observe(this, info -> {
+                    if (info != null && info.getState().isFinished()) {
+                        String[] defaultData;
+                        //defaultData = info.getOutputData().getStringArray("result");
+                        // ... do something with the result ...
+
+                        //outputTXT.setText(defaultData[0]);
+
+                        if(info.getState() == WorkInfo.State.SUCCEEDED)
+                        {
+                            outputTXT.setText("success");
+                        }
+                        else
+                        {
+                            outputTXT.setText("failed");
+                        }
+                    }
+                });
+
+        //requestData();
 
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
@@ -60,10 +93,59 @@ public class MainActivity extends AppCompatActivity {
 
                 threadManager.enqueue(wordSearch);
 
+                /*
+
+                WorkManager.getInstance().getStatusById(wordSearch.getId()).get(getApplicationContext(), info -> {
+                            if (info != null && info.getState().isFinished()) {
+                                String[] defaultData = new String[0];
+                                String[] myResult = info.getOutputData().getStringArray("result", defaultData));
+                                // ... do something with the result ...
+                            }
+                        });*/
+
+
+
 
             }
         });
     }
+
+    private void requestData()
+    {
+        FirebaseFirestore db;
+
+        db = FirebaseFirestore.getInstance();
+
+
+        outputTXT.setText(
+        db.collection("white list")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        //importantWords.add(document.getData());
+                                        //Testresults =  Testresults + String.valueOf(document.get("word"));
+                                        fields.append(document.get("word"));
+                                        String dataFound = fields.toString();
+                                        //outputTXT.setText(dataFound);
+
+
+                                    }
+                                } else {
+                                    outputTXT.setText("No data found");
+                                }
+                            }
+                        }).getResult().getDocuments().size());
+
+
+
+
+        //outputTXT.setText("from list " + database.getImportantWords().get(0));
+    }
+
+
 }
 
 
@@ -97,6 +179,8 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                         });*/
+
+
 
 /*
         // Create a new user with a first and last name

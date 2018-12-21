@@ -52,7 +52,7 @@ public class blackListInterface extends Worker {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                ingoredWords.add(document.get("word"));
+                                ingoredWords.add(document.get("word").toString());
                             }
 
                         } else {

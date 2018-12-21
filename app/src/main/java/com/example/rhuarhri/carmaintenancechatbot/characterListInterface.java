@@ -52,7 +52,7 @@ public class characterListInterface extends Worker {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                characterList.add(document.get("character"));
+                                characterList.add(document.get("character").toString());
                             }
 
                         } else {
