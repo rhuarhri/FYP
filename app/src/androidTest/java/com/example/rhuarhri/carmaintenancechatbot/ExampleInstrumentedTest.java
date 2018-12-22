@@ -161,6 +161,26 @@ public class ExampleInstrumentedTest {
     public void recordMileageTest()
     {
 
+        Context appContext = InstrumentationRegistry.getTargetContext();
+
+        carMileageController mileageController = new carMileageController(appContext);
+
+        mileageController.addMileage(100);
+
+        double recordedResult = mileageController.getMileage();
+
+        assertEquals(100, recordedResult);
+
+        mileageController.addMileage(200);
+
+        recordedResult = mileageController.getMileage();
+
+        assertEquals(200, recordedResult);
+
+        boolean updateRequired = mileageController.doesMileageNeedUpdating();
+
+        assertEquals(false, updateRequired);
+
     }
 
 }
