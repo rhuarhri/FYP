@@ -1,32 +1,115 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 public class keyWordSearch extends Worker {
 
+    List ofCharacters = new ArrayList<String>();
+    boolean charactersFound = false;
+    List blackList = new ArrayList<String>();
+    boolean blackListFound = false;
+    List whiteList = new ArrayList<String>();
+    boolean whiteListFound = false;
+
+    OneTimeWorkRequest whiteListSearch = new OneTimeWorkRequest.Builder(whiteListInterface.class).build();
+    OneTimeWorkRequest blackListSearch = new OneTimeWorkRequest.Builder(blackListInterface.class).build();
+    OneTimeWorkRequest characterSearch = new OneTimeWorkRequest.Builder(characterListInterface.class).build();
+
+
     public keyWordSearch(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+
+
+
+        WorkManager.getInstance().getWorkInfoByIdLiveData(whiteListSearch.getId())
+                .observe((LifecycleOwner) context, info -> {
+                    if (info != null && info.getState().isFinished()) {
+                        String[] defaultData;
+                        defaultData = info.getOutputData().getStringArray("result");
+                        // ... do something with the result ...
+
+                        whiteList = Arrays.asList(defaultData);
+                        whiteListFound = true;
+
+
+                    }
+                });
+
+
+
+        WorkManager.getInstance().getWorkInfoByIdLiveData(blackListSearch.getId())
+                .observe((LifecycleOwner) context, info -> {
+                    if (info != null && info.getState().isFinished()) {
+                        String[] defaultData;
+                        defaultData = info.getOutputData().getStringArray("result");
+                        // ... do something with the result ...
+
+                        blackList = Arrays.asList(defaultData);
+                        blackListFound = true;
+
+
+                    }
+                });
+
+
+
+        WorkManager.getInstance().getWorkInfoByIdLiveData(characterSearch.getId())
+                .observe((LifecycleOwner) context, info -> {
+                    if (info != null && info.getState().isFinished()) {
+                        String[] defaultData;
+                        defaultData = info.getOutputData().getStringArray("result");
+                        // ... do something with the result ...
+
+                        ofCharacters = Arrays.asList(defaultData);
+                        charactersFound = true;
+
+
+                    }
+                });
+
+
     }
 
     @NonNull
     @Override
     public Result doWork() {
 
+        WorkManager threadManager = WorkManager.getInstance();
 
+        threadManager.enqueue(whiteListSearch);
 
-        return null;
+        threadManager.enqueue(blackListSearch);
+
+        threadManager.enqueue(whiteListSearch);
+
+        while (whiteListFound == false && blackListFound == false && whiteListFound == false)
+        {
+            //wait until work is done
+        }
+
+        List<String> cleanResponse = search("");
+
+        String[] resultArray =  (String[]) cleanResponse.toArray(new String[cleanResponse.size()]);
+
+        Data output = new Data.Builder().putStringArray("result", resultArray).build();
+
+        return Result.success(output);
     }
 
-    List ofCharacters = new ArrayList<String>();
-    List blackList = new ArrayList<String>();
-    List whiteList = new ArrayList<String>();
+
 
     /*
     keyWordSearch()

@@ -43,16 +43,9 @@ public class whiteListInterface extends Worker {
         Data output = new Data.Builder().putStringArray("result", resultArray).build();
 
 
-        if(importantWords.isEmpty() == true)
-        {
-            return Result.failure();
-        }
-        else
-        {
-            return Result.success();
-        }
 
-        //return Result.success(output);
+
+        return Result.success(output);
     }
 
     public void getList()
@@ -95,7 +88,7 @@ public class whiteListInterface extends Worker {
                             resultsFound = true;
 
                         } else {
-
+                            resultsFound = true;
                         }
                     }
                 });

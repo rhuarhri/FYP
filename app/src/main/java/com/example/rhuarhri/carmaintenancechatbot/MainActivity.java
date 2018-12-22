@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity {
     OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(whiteListInterface.class).build();
 
 
-    String Testresults = "a";
+    //String Testresults = "a";
 
-    StringBuilder fields = new StringBuilder("");
+    //StringBuilder fields = new StringBuilder("");
 
 
 
@@ -89,9 +89,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                WorkManager threadManager = WorkManager.getInstance();
 
-                threadManager.enqueue(wordSearch);
 
                 /*
 
@@ -110,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /*
     private void requestData()
     {
         FirebaseFirestore db;
@@ -143,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //outputTXT.setText("from list " + database.getImportantWords().get(0));
-    }
+    }*/
 
 
 }

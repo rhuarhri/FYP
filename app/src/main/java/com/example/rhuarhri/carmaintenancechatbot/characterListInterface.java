@@ -19,6 +19,8 @@ public class characterListInterface extends Worker {
 
     FirebaseFirestore db;
     List characterList  = new ArrayList<String>();
+    String[] resultArray;
+    boolean resultsFound = false;
 
     public characterListInterface(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -30,14 +32,24 @@ public class characterListInterface extends Worker {
         return null;
     }
 
-    private List getList(){
+    private void getList(){
 
         db = FirebaseFirestore.getInstance();
 
         requestData();
 
+        while(resultsFound == false)
+        {
+            //wait until requested data is received
+        }
+
+        //finish
         db = null;
-        return  characterList;
+
+        resultArray = (String[]) characterList.toArray(new String[characterList.size()]);
+
+
+
     }
 
     private void requestData()
@@ -53,10 +65,11 @@ public class characterListInterface extends Worker {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 characterList.add(document.get("character").toString());
+                                resultsFound = true;
                             }
 
                         } else {
-
+                                resultsFound = true;
                         }
                     }
                 });

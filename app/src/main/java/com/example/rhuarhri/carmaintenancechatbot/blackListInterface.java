@@ -19,6 +19,8 @@ public class blackListInterface extends Worker {
 
     FirebaseFirestore db;
     List  ingoredWords = new ArrayList<String>();
+    String[] resultArray;
+    boolean resultsFound = false;
 
     public blackListInterface(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
@@ -30,14 +32,23 @@ public class blackListInterface extends Worker {
         return null;
     }
 
-    private List getList(){
+    private void getList(){
 
         db = FirebaseFirestore.getInstance();
 
         requestData();
 
+        while(resultsFound == false)
+        {
+            //wait until requested data is received
+        }
+
+        //finish
         db = null;
-        return  ingoredWords;
+
+        resultArray = (String[]) ingoredWords.toArray(new String[ingoredWords.size()]);
+
+
     }
 
     private void requestData()
@@ -55,11 +66,15 @@ public class blackListInterface extends Worker {
                                 ingoredWords.add(document.get("word").toString());
                             }
 
-                        } else {
+                            resultsFound = true;
 
+                        } else {
+                            resultsFound = true;
                         }
                     }
                 });
+
+
 
     }
 }
