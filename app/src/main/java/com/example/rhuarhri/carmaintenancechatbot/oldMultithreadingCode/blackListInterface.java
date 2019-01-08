@@ -1,4 +1,4 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+package com.example.rhuarhri.carmaintenancechatbot.oldMultithreadingCode;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

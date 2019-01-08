@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     Button sendUserResponseBTN;
     TextView outputTXT;
 
-    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(whiteListInterface.class).build();
+    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
 
 
     //String Testresults = "a";
@@ -65,12 +65,14 @@ public class MainActivity extends AppCompatActivity {
         WorkManager.getInstance().getWorkInfoByIdLiveData(wordSearch.getId())
                 .observe(this, info -> {
                     if (info != null && info.getState().isFinished()) {
-                        String[] defaultData;
-                        //defaultData = info.getOutputData().getStringArray("result");
+                        String defaultData;
+                        defaultData = info.getOutputData().getString("response");
                         // ... do something with the result ...
 
-                        //outputTXT.setText(defaultData[0]);
+                        outputTXT.setText(defaultData);
 
+
+                        /*
                         if(info.getState() == WorkInfo.State.SUCCEEDED)
                         {
                             outputTXT.setText("success");
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         else
                         {
                             outputTXT.setText("failed");
-                        }
+                        }*/
                     }
                 });
 
@@ -88,7 +90,9 @@ public class MainActivity extends AppCompatActivity {
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                WorkManager threadManager = WorkManager.getInstance();
 
+                threadManager.enqueue(wordSearch);
 
 
                 /*

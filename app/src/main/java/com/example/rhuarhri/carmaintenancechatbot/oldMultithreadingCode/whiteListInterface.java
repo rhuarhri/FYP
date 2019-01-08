@@ -1,6 +1,7 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+package com.example.rhuarhri.carmaintenancechatbot.oldMultithreadingCode;
 
 import android.content.Context;
+import android.service.carrier.CarrierMessagingService;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -12,28 +13,44 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-public class characterListInterface extends Worker {
+public class whiteListInterface extends Worker {
+
+    /*
+    The reason that this is in it's own thread  is
+    because this allows  the app to look at the black list
+    and the character list at the same time.
+     */
 
     FirebaseFirestore db;
-    List characterList  = new ArrayList<String>();
+    List importantWords  = new ArrayList<String>();
     String[] resultArray;
     boolean resultsFound = false;
 
-    public characterListInterface(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public whiteListInterface(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        return null;
+
+        getList();
+
+        Data output = new Data.Builder().putStringArray("result", resultArray).build();
+
+
+
+
+        return Result.success(output);
     }
 
-    private void getList(){
-
+    public void getList()
+    {
+        //start up
         db = FirebaseFirestore.getInstance();
 
         requestData();
@@ -46,7 +63,9 @@ public class characterListInterface extends Worker {
         //finish
         db = null;
 
-        resultArray = (String[]) characterList.toArray(new String[characterList.size()]);
+        resultArray = (String[]) importantWords.toArray(new String[importantWords.size()]);
+
+
 
 
 
@@ -56,7 +75,7 @@ public class characterListInterface extends Worker {
     {
 
 
-        db.collection("characters").get()
+        db.collection("white list").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -64,16 +83,15 @@ public class characterListInterface extends Worker {
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                characterList.add(document.get("character").toString());
-                                resultsFound = true;
+                                importantWords.add(document.get("word").toString());
                             }
+                            resultsFound = true;
 
                         } else {
-                                resultsFound = true;
+                            resultsFound = true;
                         }
                     }
                 });
-
     }
 
 
