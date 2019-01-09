@@ -4,9 +4,12 @@ import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
     EditText userResponseET;
     Button sendUserResponseBTN;
     TextView outputTXT;
+    RecyclerView chatDisplay;
+    RecyclerView.Adapter chatDisplayAdapter;
+    RecyclerView.LayoutManager chatDisplayLM;
+    Spinner autoAnswersDisplay;
 
     OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
 
@@ -58,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
 
         outputTXT = (TextView) findViewById(R.id.outputTXT);
 
+        chatDisplay = (RecyclerView) findViewById(R.id.chatDisplayRV);
+        chatDisplayLM = new LinearLayoutManager(this);
+        chatDisplay.setLayoutManager(chatDisplayLM);
+        chatDisplayAdapter = new chatRVAdapter();
+        chatDisplay.setAdapter(chatDisplayAdapter);
+
+        autoAnswersDisplay = (Spinner) findViewById(R.id.autoAnswerSP);
 
         userResponseET = (EditText) findViewById(R.id.userResponseET);
         sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
@@ -85,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         //requestData();
+
 
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
