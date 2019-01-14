@@ -1,4 +1,5 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+
+package com.example.rhuarhri.carmaintenancechatbot.carmileage;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;

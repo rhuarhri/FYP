@@ -1,4 +1,4 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+package com.example.rhuarhri.carmaintenancechatbot.chathistory;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
+/*
 @Dao
 public interface historyDBInterface {
 
@@ -17,6 +18,9 @@ public interface historyDBInterface {
     @Query("DELETE FROM messageHistoryTable WHERE MIN(messageId)")
     void deleteOldestValue();
 
+    @Query("DELETE FROM messageHistoryTable")
+    void startNewChatSession();
+
     @Query("SELECT COUNT(*) FROM messageHistoryTable")
     int getHistorySize();
 
@@ -24,4 +28,4 @@ public interface historyDBInterface {
     void addMessage(messageHistoryTable newData);
 
 
-}
+}*/

@@ -1,5 +1,6 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.LifecycleOwner;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+//import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryController;
+import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
+import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -28,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -47,15 +52,15 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView.LayoutManager chatDisplayLM;
     Spinner autoAnswersDisplay;
 
-    OneTimeWorkRequest  wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
+    List<chatResponse> chatHistory = new ArrayList<>();
+    chatHistoryManager historyManger = new chatHistoryManager();
+
+    OneTimeWorkRequest wordSearch; //= new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
 
 
     //String Testresults = "a";
 
     //StringBuilder fields = new StringBuilder("");
-
-
-
 
 
     @Override
@@ -68,13 +73,25 @@ public class MainActivity extends AppCompatActivity {
         chatDisplay = (RecyclerView) findViewById(R.id.chatDisplayRV);
         chatDisplayLM = new LinearLayoutManager(this);
         chatDisplay.setLayoutManager(chatDisplayLM);
-        chatDisplayAdapter = new chatRVAdapter();
+        chatDisplayAdapter = new chatRVAdapter(chatHistory);
         chatDisplay.setAdapter(chatDisplayAdapter);
 
         autoAnswersDisplay = (Spinner) findViewById(R.id.autoAnswerSP);
 
         userResponseET = (EditText) findViewById(R.id.userResponseET);
         sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
+
+
+        /*@SuppressLint("RestrictedApi")*/ Data myData = new Data.Builder()
+                // We need to pass three integers: X, Y, and Z
+                //.put("access", db)
+                .putString("data", "Lights don't work")
+
+                // ... and build the actual Data object:
+                .build();
+
+        wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class)
+                .setInputData(myData).build();
 
         WorkManager.getInstance().getWorkInfoByIdLiveData(wordSearch.getId())
                 .observe(this, info -> {
@@ -84,6 +101,14 @@ public class MainActivity extends AppCompatActivity {
                         // ... do something with the result ...
 
                         outputTXT.setText(defaultData);
+
+                        historyManger.addResponse(defaultData, "bot");
+                        historyManger.addResponse("thread done", "bot");
+
+                        chatHistory = historyManger.getHistory();
+
+                        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                        chatDisplay.setAdapter(chatDisplayAdapter);
 
 
                         /*
@@ -101,16 +126,157 @@ public class MainActivity extends AppCompatActivity {
         //requestData();
 
 
-
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 WorkManager threadManager = WorkManager.getInstance();
 
+                historyManger.addResponse("Welcome", "bot");
+                historyManger.addResponse("Lights don't work", "user");
+
+                chatHistory = historyManger.getHistory();
+
+                chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                chatDisplay.setAdapter(chatDisplayAdapter);
+
+                FirebaseFirestore db;
+
+                db = FirebaseFirestore.getInstance();
+
+                /*@SuppressLint("RestrictedApi")* Data myData = new Data.Builder()
+                        // We need to pass three integers: X, Y, and Z
+                        //.put("access", db)
+                        .putString("data", "Lights don't work")
+
+                        // ... and build the actual Data object:
+                        .build();
+
+                wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class)
+                        .setInputData(myData).build();*/
+
                 threadManager.enqueue(wordSearch);
 
 
                 /*
+                responseManager RM = new responseManager();
+
+                String response = RM.findResponse("Lights don't work");
+
+                outputTXT.setText(response);
+
+                historyManger.addResponse(response, "bot");*/
+
+
+
+
+                /*
+
+
+
+                CollectionReference questionSearch = db.collection("questions");
+
+                //response = "" + cleanResponse.get(0) + " ";
+
+                Query responseBasedOn = questionSearch.whereEqualTo("work", "");
+
+/*
+        for (int i = 1; i < cleanResponse.size(); i++)
+        {
+            //responseBasedOn += questionSearch.whereArrayContains("input", cleanResponse.get(i));
+            responseBasedOn.whereEqualTo(cleanResponse.get(i), "");
+        }*
+
+                responseBasedOn.get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                //lookingForData = false;
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        //response = "thread"; //document.get("response").toString();
+                                        outputTXT.setText(document.get("response").toString());
+
+                                    }
+
+                                }
+
+                                //DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                                //response = document.get("response").toString();
+                            }
+                        });
+
+
+
+/*
+
+
+                CollectionReference questionSearch = db.collection("questions");
+
+                Query responseBasedOn = questionSearch.whereEqualTo("work", "");
+
+                responseBasedOn.get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        //response = "thread";/*document.get("response").toString();*
+                                    }
+
+                                }
+                            }});
+
+
+
+
+                List<String> searchFor = new ArrayList<String>();
+
+                searchFor.add("work");
+                searchFor.add("lights");
+                searchFor.add("don't");
+
+
+
+
+                db.collection("questions").whereEqualTo(searchFor.get(0), "")
+                        .whereEqualTo(searchFor.get(1), "").whereEqualTo(searchFor.get(2), "").get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                        outputTXT.setText(document.get("response").toString());
+
+                                        historyManger.addResponse(document.get("response").toString(), "bot");
+
+                                        chatHistory = historyManger.getHistory();
+
+                                        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                                        chatDisplay.setAdapter(chatDisplayAdapter);
+
+
+                                    }
+                                } else {
+                                    outputTXT.setText("No data found");
+                                }
+                            }
+                        });
+*/
+
+
+
+
+/*
+                WorkManager.getInstance().getWorkInfoByIdLiveData(wordSearch.getId()).getValue()
+                        .observe((LifecycleOwner) getApplicationContext(), info -> {
+                            if (info != null && info.getState().isFinished()) {
+                                String[] defaultData = new String[0];
+                                String[] myResult = info.getOutputData().getStringArray("result");                                // ... do something with the result ...
+                            }
+                        });
+
+
 
                 WorkManager.getInstance().getStatusById(wordSearch.getId()).get(getApplicationContext(), info -> {
                             if (info != null && info.getState().isFinished()) {
@@ -121,12 +287,11 @@ public class MainActivity extends AppCompatActivity {
                         });*/
 
 
-
-
             }
         });
     }
 
+}
     /*
     private void requestData()
     {
@@ -164,8 +329,11 @@ public class MainActivity extends AppCompatActivity {
     }*/
 
 
-}
 
+
+//chatHistoryController newMessage = new chatHistoryController(getApplicationContext());
+//newMessage.addMessage("welcome", "bot");
+//chatDisplayAdapter.notifyDataSetChanged();
 
 //CollectionReference citiesRef = db.collection("users");
 /*

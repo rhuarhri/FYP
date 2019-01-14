@@ -3,11 +3,14 @@ package com.example.rhuarhri.carmaintenancechatbot;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.List;
@@ -20,49 +23,49 @@ public class UserResponseManager extends Worker {
 
 
     FirebaseFirestore db;
-    String response = "";
+    String response = "no data found";
+
+    String userResponse = "";
 
     public UserResponseManager(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+
     }
+
+
 
 
     @NonNull
     @Override
     public Result doWork() {
 
+
+         userResponse = getInputData().getString("data");
+        userResponse = "Lights don't work";
+
+
+
         keyWordSearch newSearch = new keyWordSearch();
 
-        newSearch.runSearch("");
+        newSearch.runSearch(userResponse);
 
         List<String> cleanResponse = newSearch.getCleanResponse();
         List<String> importantWords = newSearch.getImportantWords();
 
 
-        db = FirebaseFirestore.getInstance();
 
-        CollectionReference questionSearch = db.collection("question");
+        responseManager RM = new responseManager();
 
-        Query responseBasedOn = questionSearch.whereArrayContains("input", cleanResponse);
 
-        /*
-        for (int i = 1; i < cleanResponse.size(); i++)
-        {
-            responseBasedOn += questionSearch.whereArrayContains("input", cleanResponse.get(i));
-        }*/
 
-        responseBasedOn.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
-                response = document.get("response").toString();
-            }
-        });
+        response = RM.findResponse(cleanResponse, importantWords);
 
         Data output = new Data.Builder().putString("response", response).build();
 
         return Result.success(output);
     }
+
+
 
 
 }

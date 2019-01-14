@@ -1,11 +1,17 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+
+package com.example.rhuarhri.carmaintenancechatbot.chathistory;
+
 
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
+
 import java.util.List;
 
+/*
 public class chatHistoryController {
+
+
 
     historyDBController dbController;
 
@@ -25,14 +31,19 @@ public class chatHistoryController {
 
         dbController.dbInterface().addMessage(newData);
 
-        getHistory();
+        manageHistory();
 
     }
 
 
-    public List getHistory()
+    public List<messageHistoryTable> getHistory()
     {
         return dbController.dbInterface().getHistory();
+    }
+
+    public void newChatSession()
+    {
+        dbController.dbInterface().startNewChatSession();
     }
 
     private void manageHistory()
@@ -49,4 +60,8 @@ public class chatHistoryController {
 
         }
     }
+
+
+
 }
+*/

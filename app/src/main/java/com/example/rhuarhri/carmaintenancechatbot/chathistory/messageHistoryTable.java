@@ -1,9 +1,11 @@
-package com.example.rhuarhri.carmaintenancechatbot;
+
+package com.example.rhuarhri.carmaintenancechatbot.chathistory;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+/*
 @Entity
 public class messageHistoryTable {
 
@@ -42,4 +44,6 @@ public class messageHistoryTable {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }
+*/

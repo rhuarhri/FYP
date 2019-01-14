@@ -56,9 +56,9 @@ public class keyWordSearch {
             //wait until work is done
         }
 
-        cleanResponse = search("Lights don't work");
+        cleanResponse = search(response);
 
-
+        db = null;
     }
 
     List<String> getCleanResponse()
