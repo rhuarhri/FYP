@@ -21,6 +21,7 @@ import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+/*
 public class keyWordSearch {
 
     List ofCharacters = new ArrayList<String>();
@@ -45,6 +46,8 @@ public class keyWordSearch {
     {
         db = FirebaseFirestore.getInstance();
 
+
+
         getWhiteList();
 
         getBlackList();
@@ -58,7 +61,7 @@ public class keyWordSearch {
 
         cleanResponse = search(response);
 
-        db = null;
+
     }
 
     List<String> getCleanResponse()

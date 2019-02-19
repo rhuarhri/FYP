@@ -1,17 +1,23 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
 import android.annotation.SuppressLint;
+import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleOwner;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryController;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
@@ -23,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -44,6 +51,10 @@ import com.google.firebase.database.FirebaseDatabase;*/
 
 public class MainActivity extends AppCompatActivity {
 
+    boolean lookingForData = true;
+
+    int placeInList = 1;
+
     EditText userResponseET;
     Button sendUserResponseBTN;
     TextView outputTXT;
@@ -56,11 +67,24 @@ public class MainActivity extends AppCompatActivity {
     chatHistoryManager historyManger = new chatHistoryManager();
 
     OneTimeWorkRequest wordSearch; //= new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
+    WorkManager threadManager = WorkManager.getInstance();
+    LifecycleOwner lifecycleOwner;
+
+    //FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    /*
+    FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+            .setPersistenceEnabled(true)
+            .build();*/
+
+    String response = "";
 
 
     //String Testresults = "a";
 
     //StringBuilder fields = new StringBuilder("");
+
+    UserResponseManager ResponseManager;
 
 
     @Override
@@ -78,32 +102,182 @@ public class MainActivity extends AppCompatActivity {
 
         autoAnswersDisplay = (Spinner) findViewById(R.id.autoAnswerSP);
 
+
         userResponseET = (EditText) findViewById(R.id.userResponseET);
         sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
 
 
-        /*@SuppressLint("RestrictedApi")*/ Data myData = new Data.Builder()
-                // We need to pass three integers: X, Y, and Z
-                //.put("access", db)
-                .putString("data", "Lights don't work")
 
-                // ... and build the actual Data object:
+
+        ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET);
+
+        ResponseManager.search("welcome");
+
+
+        sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                //historyManger.addResponse("lights don't work", "user");
+
+                //chatHistory = historyManger.getHistory();
+
+                //chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                //chatDisplay.setAdapter(chatDisplayAdapter);
+
+
+                //ManageUserResponse("lights don't work");
+                //ManageUserResponse("welcome");
+
+                //List<String> importantWords = new ArrayList<>();
+
+
+                ResponseManager.search(userResponseET.getText().toString());
+
+                //findResponse(null, chatDisplay);
+
+                //outputTXT.setText(RM.findResponse(db, "work", importantWords));
+
+
+            }
+        });
+    }
+}
+
+
+    //PAST CODE
+    /*
+    public void findResponse(List<String> cleanResponse, RecyclerView chatRecyclerView)
+    {
+
+
+
+        String key = "work";
+
+        cleanResponse = new ArrayList<String>();
+        cleanResponse.add("lights");
+        cleanResponse.add("don't");
+        cleanResponse.add("work");
+        //cleanResponse.add("on");
+
+
+        int currentPlaceInList = 1;
+
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        /*
+
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
                 .build();
+        db.setFirestoreSettings(settings);*
+
+        //while (tooManyResponses == true) {
+
+
+
+        //response = "" + cleanResponse.get(0) + " ";
+
+        Query responseBasedOn = questionSearch.whereEqualTo("input." + cleanResponse.get(0), "");
+
+        Query questionSearch = db.collection("questions").whereEqualTo("input." + cleanResponse.get(0), "");
+
+        Query temp = questionSearch;
+        Query questionSearch2 = questionSearch;
+
+
+        for (int i = 1; i < cleanResponse.size(); i++)
+        {
+          questionSearch2 = temp.whereEqualTo("input." + cleanResponse.get(i), "");
+          temp = questionSearch2;
+        }
+
+
+        //Query questionSearch2 = questionSearch.whereEqualTo("input." + cleanResponse.get(2), "");
+
+
+
+
+
+
+
+        Query responseBasedOn = questionSearch2;
+
+
+        /*
+            for (int i = 1; i < cleanResponse.size(); i++) {
+                //responseBasedOn.whereEqualTo("input." + cleanResponse.get(i), "");
+                questionSearch.whereEqualTo("input." + cleanResponse.get(i), "");
+            }*
+
+
+
+/*
+        for (int i = 1; i < cleanResponse.size(); i++)
+        {
+            //responseBasedOn += questionSearch.whereArrayContains("input", cleanResponse.get(i));
+            responseBasedOn.whereEqualTo(cleanResponse.get(i), "");
+        }*
+
+        responseBasedOn.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                                if(task.getResult().size() > 1)
+                                {
+                                    //too many responses
+                                    lookingForData = true;
+
+                                }
+                                else {
+                            lookingForData = false;
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                String response = document.get("response").toString();
+                                historyManger.addResponse(response, "bot");
+
+                                chatHistory = historyManger.getHistory();
+
+                                chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                                chatRecyclerView.setAdapter(chatDisplayAdapter);
+
+
+                            }
+                            }
+
+                        }
+
+
+                        //DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                        //response = document.get("response").toString();
+                    }
+                });
+
+
+
+
+
+
+
+    }
+    private void ManageUserResponse(String response)
+    {
+        Data myData = new Data.Builder().putString("data", response).build();
+
 
         wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class)
                 .setInputData(myData).build();
 
         WorkManager.getInstance().getWorkInfoByIdLiveData(wordSearch.getId())
-                .observe(this, info -> {
+                .observe(lifecycleOwner, info -> {
                     if (info != null && info.getState().isFinished()) {
                         String defaultData;
                         defaultData = info.getOutputData().getString("response");
                         // ... do something with the result ...
 
-                        outputTXT.setText(defaultData);
-
                         historyManger.addResponse(defaultData, "bot");
-                        historyManger.addResponse("thread done", "bot");
 
                         chatHistory = historyManger.getHistory();
 
@@ -111,50 +285,15 @@ public class MainActivity extends AppCompatActivity {
                         chatDisplay.setAdapter(chatDisplayAdapter);
 
 
-                        /*
-                        if(info.getState() == WorkInfo.State.SUCCEEDED)
-                        {
-                            outputTXT.setText("success");
-                        }
-                        else
-                        {
-                            outputTXT.setText("failed");
-                        }*/
                     }
                 });
 
-        //requestData();
+        threadManager.enqueue(wordSearch);
 
+    }
 
-        sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                WorkManager threadManager = WorkManager.getInstance();
+}
 
-                historyManger.addResponse("Welcome", "bot");
-                historyManger.addResponse("Lights don't work", "user");
-
-                chatHistory = historyManger.getHistory();
-
-                chatDisplayAdapter = new chatRVAdapter(chatHistory);
-                chatDisplay.setAdapter(chatDisplayAdapter);
-
-                FirebaseFirestore db;
-
-                db = FirebaseFirestore.getInstance();
-
-                /*@SuppressLint("RestrictedApi")* Data myData = new Data.Builder()
-                        // We need to pass three integers: X, Y, and Z
-                        //.put("access", db)
-                        .putString("data", "Lights don't work")
-
-                        // ... and build the actual Data object:
-                        .build();
-
-                wordSearch = new OneTimeWorkRequest.Builder(UserResponseManager.class)
-                        .setInputData(myData).build();*/
-
-                threadManager.enqueue(wordSearch);
 
 
                 /*
@@ -286,12 +425,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });*/
 
-
-            }
-        });
-    }
-
-}
     /*
     private void requestData()
     {
