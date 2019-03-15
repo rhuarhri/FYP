@@ -6,6 +6,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.rhuarhri.carmaintenancechatbot.carmileage.carMileageTable;
+
+import java.util.Calendar;
+
 public class carHistoryActivity extends AppCompatActivity {
 
     EditText mileageET;
@@ -35,5 +39,13 @@ public class carHistoryActivity extends AppCompatActivity {
     {
         int mileage = Integer.parseInt(newMileage);
         int fuel = Integer.parseInt(newFuelAmount);
+
+        carMileageTable CurrentMileage = new carMileageTable();
+
+        CurrentMileage.setMileage(mileage);
+        CurrentMileage.setDateRecorded(Calendar.getInstance().getTime().getTime());
+        CurrentMileage.setWasServiced(false);
+
+
     }
 }
