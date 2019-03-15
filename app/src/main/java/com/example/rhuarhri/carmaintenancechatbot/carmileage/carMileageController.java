@@ -10,6 +10,7 @@ import java.util.Date;
 
 import static java.lang.Math.round;
 
+/*
 public class carMileageController {
 
     databaseController dbController;
@@ -65,7 +66,7 @@ public class carMileageController {
         result to the nearest hole number thus removing some unnecessary data.
 
         The value 25920 is about 30 days in milliseconds if 10000 was added to it.
-         */
+         *
 
         double dateDifference = (CurrentDate.getTime() - recordedDate.getTime()) / 10000;
         if (round(dateDifference) > 25920)
@@ -80,3 +81,4 @@ public class carMileageController {
 
     }
 }
+*/

@@ -14,20 +14,28 @@ public class carMileageTable {
     int mileageID;
 
     @ColumnInfo(name = "mileage")
-    double mileage;
+    int mileage;
+
+    @ColumnInfo(name = "serviced")
+    boolean wasServiced;
 
     @ColumnInfo(name = "recordedOn")
-    Date dateRecorded;
+    long dateRecorded;
 
     public int getMileageID() {
         return mileageID;
     }
 
-    public double getMileage() {
+
+    public int getMileage() {
         return mileage;
     }
 
-    public Date getDateRecorded() {
+    public boolean isWasServiced() {
+        return wasServiced;
+    }
+
+    public long getDateRecorded() {
         return dateRecorded;
     }
 
@@ -35,11 +43,15 @@ public class carMileageTable {
         this.mileageID = mileageID;
     }
 
-    public void setMileage(double mileage) {
+    public void setMileage(int mileage) {
         this.mileage = mileage;
     }
 
-    public void setDateRecorded(Date dateRecorded) {
+    public void setWasServiced(boolean wasServiced) {
+        this.wasServiced = wasServiced;
+    }
+
+    public void setDateRecorded(long dateRecorded) {
         this.dateRecorded = dateRecorded;
     }
 }

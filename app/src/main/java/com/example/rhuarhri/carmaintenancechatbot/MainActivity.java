@@ -1,48 +1,22 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
-import android.annotation.SuppressLint;
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleOwner;
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.support.annotation.NonNull;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 //import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryController;
+import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 /*
 import com.crashlytics.android.answers.FirebaseAnalyticsEventMapper;
@@ -57,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     EditText userResponseET;
     Button sendUserResponseBTN;
-    TextView outputTXT;
+    Button editStatsBTN;
     RecyclerView chatDisplay;
     RecyclerView.Adapter chatDisplayAdapter;
     RecyclerView.LayoutManager chatDisplayLM;
@@ -66,13 +40,15 @@ public class MainActivity extends AppCompatActivity {
     List<chatResponse> chatHistory = new ArrayList<>();
     chatHistoryManager historyManger = new chatHistoryManager();
 
-    OneTimeWorkRequest wordSearch; //= new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
+    carServicing checkServiceHistory;
+
+    /*OneTimeWorkRequest wordSearch; //= new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
     WorkManager threadManager = WorkManager.getInstance();
     LifecycleOwner lifecycleOwner;
 
     //FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    /*
+
     FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
             .setPersistenceEnabled(true)
             .build();*/
@@ -92,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        outputTXT = (TextView) findViewById(R.id.outputTXT);
+
 
         chatDisplay = (RecyclerView) findViewById(R.id.chatDisplayRV);
         chatDisplayLM = new LinearLayoutManager(this);
@@ -105,13 +81,26 @@ public class MainActivity extends AppCompatActivity {
 
         userResponseET = (EditText) findViewById(R.id.userResponseET);
         sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
-
+        editStatsBTN = (Button) findViewById(R.id.editStatsBTN);
 
 
 
         ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET);
 
-        ResponseManager.search("welcome");
+        checkServiceHistory = new carServicing(getApplicationContext());
+
+
+
+        if(checkServiceHistory.carNeedsServicing() == true)
+        {
+            ResponseManager.search("servicing");
+            checkServiceHistory.carServiced();
+        }
+        else
+        {
+            ResponseManager.search("welcome");
+        }
+
 
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
@@ -142,6 +131,18 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        editStatsBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent goToCarHistoryActivity = new Intent(getApplicationContext(), carHistoryActivity.class);
+
+                startActivity(goToCarHistoryActivity);
+
+            }
+        });
+
+
     }
 }
 
