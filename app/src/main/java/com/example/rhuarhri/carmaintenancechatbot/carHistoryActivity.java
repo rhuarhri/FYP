@@ -5,8 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ToggleButton;
 
+import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumption;
+import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumptionTable;
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carMileageTable;
+import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 
 import java.util.Calendar;
 
@@ -16,6 +21,8 @@ public class carHistoryActivity extends AppCompatActivity {
     EditText fuelET;
 
     Button saveBTN;
+    ToggleButton distanceTBTN;
+    ImageView testIV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +33,9 @@ public class carHistoryActivity extends AppCompatActivity {
         fuelET = (EditText) findViewById(R.id.fuelET);
 
         saveBTN = (Button) findViewById(R.id.saveBTN);
+        distanceTBTN = (ToggleButton) findViewById(R.id.distanceTBTN);
+
+
 
         saveBTN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,19 +43,45 @@ public class carHistoryActivity extends AppCompatActivity {
                 saveData(mileageET.getText().toString(), fuelET.getText().toString());
             }
         });
+
+        testIV = (ImageView) findViewById(R.id.testIV);
+
+        testImageGetter test = new testImageGetter();
+        test.getImage(testIV, getApplicationContext());
     }
 
     public void saveData(String newMileage, String newFuelAmount)
     {
-        int mileage = Integer.parseInt(newMileage);
-        int fuel = Integer.parseInt(newFuelAmount);
 
-        carMileageTable CurrentMileage = new carMileageTable();
+        int mileage = 0;
+        double fuel = Double.parseDouble(newFuelAmount);
 
-        CurrentMileage.setMileage(mileage);
-        CurrentMileage.setDateRecorded(Calendar.getInstance().getTime().getTime());
-        CurrentMileage.setWasServiced(false);
+        if (distanceTBTN.isChecked())
+        {
+            mileage = Integer.parseInt(newMileage);
+        }
+        else
+        {
+            mileage = convertToKilometers(Integer.parseInt(newMileage));
+        }
 
 
+
+        carServicing addCarServicing = new carServicing(getApplicationContext());
+
+        addCarServicing.carNotServiced(mileage);
+
+        fuelConsumption addFuelConsumption = new fuelConsumption(getApplicationContext());
+
+        addFuelConsumption.fuelAdded(fuel, mileage);
+
+
+    }
+
+    private int convertToKilometers(int distance)
+    {
+        int inKilometers = (int) Math.round(distance * 1.60934);
+
+        return inKilometers;
     }
 }

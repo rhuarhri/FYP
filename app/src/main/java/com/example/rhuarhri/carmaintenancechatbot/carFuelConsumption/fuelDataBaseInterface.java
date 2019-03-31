@@ -17,6 +17,15 @@ public interface fuelDataBaseInterface {
     @Query("SELECT * FROM fuelConsumptionTable WHERE date BETWEEN :StartDate AND :EndDate")
     List<fuelConsumptionTable> getHistoryInTimePeriod(long StartDate, long EndDate);
 
+    @Query("SELECT date FROM fuelConsumptionTable WHERE id = 1")
+    long getFirstDate();
+
+    @Query("DELETE FROM fuelConsumptionTable")
+    void reset();
+
+    @Query("SELECT COUNT(*) FROM fuelConsumptionTable")
+    int isDatabaseEmpty();
+
 
 
 }

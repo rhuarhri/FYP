@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumption;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.documentMap;
@@ -33,7 +34,7 @@ public class UserResponseManager {
     String UserResponse = "";
 
     List<chatResponse> chatHistory = new ArrayList<>();
-    chatHistoryManager historyManger = new chatHistoryManager();
+    chatHistoryManager historyManager = new chatHistoryManager();
     RecyclerView.Adapter chatDisplayAdapter;
 
     documentMap documentHistory = new documentMap();
@@ -65,10 +66,10 @@ public class UserResponseManager {
 
         //welcome is a auto generated message and should be ignored
         if (UserResponse != "welcome") {
-            historyManger.addResponse(userResponse, "user");
+            historyManager.addResponse(userResponse, "user");
         }
 
-        chatHistory = historyManger.getHistory();
+        chatHistory = historyManager.getHistory();
 
         chatDisplayAdapter = new chatRVAdapter(chatHistory);
         chatRV.setAdapter(chatDisplayAdapter);
@@ -273,9 +274,9 @@ public class UserResponseManager {
                                         userAttempts = 0;
                                     }
 
-                                    historyManger.addResponse(response, "bot");
+                                    historyManager.addResponse(response, "bot");
 
-                                    chatHistory = historyManger.getHistory();
+                                    chatHistory = historyManager.getHistory();
 
                                     chatDisplayAdapter = new chatRVAdapter(chatHistory);
                                     chatRV.setAdapter(chatDisplayAdapter);
@@ -284,19 +285,24 @@ public class UserResponseManager {
                                 else {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         String response = document.get("response").toString();
-                                        List<String> suggestions = (List<String>) document.get("suggestions");
-                                        getNewSpinnerAdapter(suggestions);
-                                        historyManger.addResponse(response, "bot");
-
-                                        chatHistory = historyManger.getHistory();
-
-                                        chatDisplayAdapter = new chatRVAdapter(chatHistory);
-                                        chatRV.setAdapter(chatDisplayAdapter);
 
                                         //welcome auto generated message and should be ignored
                                         if (UserResponse != "welcome") {
                                             documentHistory.addDocument(document.getId());
                                         }
+
+                                        List<String> suggestions = (List<String>) document.get("suggestions");
+                                        getNewSpinnerAdapter(suggestions);
+                                        historyManager.addResponse(response, "bot");
+
+                                        chatHistory = historyManager.getHistory();
+
+                                        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                                        chatRV.setAdapter(chatDisplayAdapter);
+
+
+                                        //go back to welcome message
+                                        chatEnd(response);
 
                                         userAttempts = 0;
                                     }
@@ -310,6 +316,31 @@ public class UserResponseManager {
                     }
                 });
         }
+
+    private void chatEnd(String response)
+    {
+        if (response.equals("fuel null"))
+        {
+            //reset fuel consumption data
+            fuelConsumption rest = new fuelConsumption(context);
+            rest.resetFuelConsumption();
+            restChat();
+        }
+        if (response.equals("null"))
+        {
+            restChat();
+        }
+
+    }
+
+    private void restChat()
+    {
+        documentHistory = new documentMap();
+        historyManager = new chatHistoryManager();
+        List<String> responseList = new ArrayList<String>();
+        responseList.add("welcome");
+        findResponse(responseList);
+    }
 
 
         private void getNewSpinnerAdapter(List<String> suggestions)
@@ -334,6 +365,8 @@ public class UserResponseManager {
 
 
         }
+
+
 
 
 }

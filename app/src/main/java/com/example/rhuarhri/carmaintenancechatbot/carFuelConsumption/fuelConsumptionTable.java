@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity
 public class fuelConsumptionTable {
 
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     int fuelAmountID;
 

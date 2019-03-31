@@ -9,13 +9,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 //import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryController;
+import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumption;
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /*
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     chatHistoryManager historyManger = new chatHistoryManager();
 
     carServicing checkServiceHistory;
+    fuelConsumption checkFuelConsumption;
 
     /*OneTimeWorkRequest wordSearch; //= new OneTimeWorkRequest.Builder(UserResponseManager.class).build();
     WorkManager threadManager = WorkManager.getInstance();
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET);
 
         checkServiceHistory = new carServicing(getApplicationContext());
+        checkFuelConsumption = new fuelConsumption(getApplicationContext());
 
 
 
@@ -95,11 +100,24 @@ public class MainActivity extends AppCompatActivity {
         {
             ResponseManager.search("servicing");
             checkServiceHistory.carServiced();
+
+        }
+        else if((Calendar.getInstance().getTime().getTime() / (1000*60*60*24) % 100) == 0)
+        {
+            if (checkFuelConsumption.isFuelConsumptionNormal() == false)
+            {
+                //fuel consumption higher than normal
+            }
+            else
+            {
+                ResponseManager.search("welcome");
+            }
         }
         else
         {
             ResponseManager.search("welcome");
         }
+
 
 
 

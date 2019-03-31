@@ -33,6 +33,18 @@ public class carServicing {
 
     }
 
+    public void carNotServiced(int mileage)
+    {
+        addServiceHistory = new carMileageTable();
+
+        addServiceHistory.setDateRecorded(Calendar.getInstance().getTime().getTime());
+        addServiceHistory.setMileage(mileage);
+        addServiceHistory.setWasServiced(false);
+
+        addMileage.dbInterface().addMileage(addServiceHistory);
+
+    }
+
     public void carServiced()
     {
 
