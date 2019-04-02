@@ -66,12 +66,12 @@ public class UserResponseManager {
 
         //welcome is a auto generated message and should be ignored
         if (UserResponse != "welcome") {
-            historyManager.addResponse(userResponse, "user");
+            historyManager.addUserResponse(userResponse);
         }
 
         chatHistory = historyManager.getHistory();
 
-        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+        chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
         chatRV.setAdapter(chatDisplayAdapter);
 
 
@@ -116,7 +116,6 @@ public class UserResponseManager {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 ofCharacters.add(document.get("character").toString());
-
                             }
 
                             for (int i = 0; responseArray.length > i; i++) {
@@ -182,11 +181,6 @@ public class UserResponseManager {
                         }
                     }});
 
-
-
-
-
-
     }
 
     private String removeUseless(String currentWord, List<String> ofCharacters)
@@ -208,15 +202,12 @@ public class UserResponseManager {
     private void findResponse(List<String> cleanResponse)
     {
 
-
-
         DocumentReference tempColl = null;
         DocumentReference tempColl2 = null;
 
         List<String> docList = documentHistory.getDocumentHistory();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
 
         Query questionSearch = null;
 
@@ -263,7 +254,6 @@ public class UserResponseManager {
                                     //no response found
                                     String response = "I did not understand that could you try again";
 
-
                                     userAttempts++;
 
                                     if (userAttempts >= 3)
@@ -274,17 +264,20 @@ public class UserResponseManager {
                                         userAttempts = 0;
                                     }
 
-                                    historyManager.addResponse(response, "bot");
+                                    historyManager.addBotResponse(response, "sad", "", "");
 
                                     chatHistory = historyManager.getHistory();
 
-                                    chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                                    chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
                                     chatRV.setAdapter(chatDisplayAdapter);
 
                                 }
                                 else {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         String response = document.get("response").toString();
+                                        String emotion = document.get("emotion").toString();
+                                        String image = document.get("image").toString();
+                                        String imageDescription = document.get("description").toString();
 
                                         //welcome auto generated message and should be ignored
                                         if (UserResponse != "welcome") {
@@ -293,11 +286,11 @@ public class UserResponseManager {
 
                                         List<String> suggestions = (List<String>) document.get("suggestions");
                                         getNewSpinnerAdapter(suggestions);
-                                        historyManager.addResponse(response, "bot");
+                                        historyManager.addBotResponse(response, emotion, image, imageDescription);
 
                                         chatHistory = historyManager.getHistory();
 
-                                        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+                                        chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
                                         chatRV.setAdapter(chatDisplayAdapter);
 
 
@@ -308,10 +301,7 @@ public class UserResponseManager {
                                     }
                                 }
 
-
                         }
-
-
 
                     }
                 });
@@ -362,13 +352,7 @@ public class UserResponseManager {
 
                 }
             });
-
-
         }
-
-
-
-
 }
 
 

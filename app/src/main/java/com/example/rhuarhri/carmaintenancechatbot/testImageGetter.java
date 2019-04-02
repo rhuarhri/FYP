@@ -1,5 +1,6 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+/*
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -64,7 +65,7 @@ public class testImageGetter {
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
             }
-        });*/
+        });*
 // Reference to an image file in Cloud Storage
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -78,4 +79,4 @@ public class testImageGetter {
 
     }
 
-}
+}*/

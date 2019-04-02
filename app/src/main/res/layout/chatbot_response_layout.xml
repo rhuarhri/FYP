@@ -14,16 +14,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:background="@color/colorPrimaryDark"
             android:textAlignment="textStart"
             android:textColor="#fff"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toEndOf="@+id/emotionIV"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emotionIV" />
 
         <ImageView
             android:id="@+id/emotionIV"
@@ -37,11 +35,13 @@
             android:id="@+id/infoIV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/emotionIV"
-            app:layout_constraintTop_toBottomOf="@+id/responseTXT"
-            app:srcCompat="@mipmap/ic_launcher" />
+            android:maxWidth="250dp"
+            android:maxHeight="250dp"
+            android:minWidth="100dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/responseTXT"
+            app:layout_constraintStart_toStartOf="@+id/responseTXT"
+            app:layout_constraintTop_toBottomOf="@+id/responseTXT" />
     </android.support.constraint.ConstraintLayout>
 </LinearLayout>

@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         chatDisplay = (RecyclerView) findViewById(R.id.chatDisplayRV);
         chatDisplayLM = new LinearLayoutManager(this);
         chatDisplay.setLayoutManager(chatDisplayLM);
-        chatDisplayAdapter = new chatRVAdapter(chatHistory);
+        chatDisplayAdapter = new chatRVAdapter(getApplicationContext(), chatHistory);
         chatDisplay.setAdapter(chatDisplayAdapter);
 
         autoAnswersDisplay = (Spinner) findViewById(R.id.autoAnswerSP);

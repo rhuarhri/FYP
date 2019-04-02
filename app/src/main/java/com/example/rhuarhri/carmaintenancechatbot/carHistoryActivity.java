@@ -1,5 +1,6 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,7 +23,6 @@ public class carHistoryActivity extends AppCompatActivity {
 
     Button saveBTN;
     ToggleButton distanceTBTN;
-    ImageView testIV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +35,6 @@ public class carHistoryActivity extends AppCompatActivity {
         saveBTN = (Button) findViewById(R.id.saveBTN);
         distanceTBTN = (ToggleButton) findViewById(R.id.distanceTBTN);
 
-
-
         saveBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -44,10 +42,6 @@ public class carHistoryActivity extends AppCompatActivity {
             }
         });
 
-        testIV = (ImageView) findViewById(R.id.testIV);
-
-        testImageGetter test = new testImageGetter();
-        test.getImage(testIV, getApplicationContext());
     }
 
     public void saveData(String newMileage, String newFuelAmount)
@@ -65,8 +59,6 @@ public class carHistoryActivity extends AppCompatActivity {
             mileage = convertToKilometers(Integer.parseInt(newMileage));
         }
 
-
-
         carServicing addCarServicing = new carServicing(getApplicationContext());
 
         addCarServicing.carNotServiced(mileage);
@@ -75,6 +67,9 @@ public class carHistoryActivity extends AppCompatActivity {
 
         addFuelConsumption.fuelAdded(fuel, mileage);
 
+        Intent goToSavedDataScreen = new Intent(getApplicationContext(), savedDataActivity.class);
+
+        startActivity(goToSavedDataScreen);
 
     }
 
