@@ -26,4 +26,17 @@ public class documentMap {
     public List<String> getDocumentHistory() {
         return documentHistory;
     }
+
+    public boolean mapEmpty()
+    {
+        if(documentHistory.size() >= 1)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+
+    }
 }

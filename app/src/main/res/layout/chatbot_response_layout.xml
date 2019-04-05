@@ -33,12 +33,12 @@
 
         <ImageView
             android:id="@+id/infoIV"
-            android:layout_width="wrap_content"
+            android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:maxWidth="250dp"
-            android:maxHeight="250dp"
-            android:minWidth="100dp"
+            android:maxWidth="260dp"
+            android:maxHeight="260dp"
+            android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/responseTXT"
             app:layout_constraintStart_toStartOf="@+id/responseTXT"

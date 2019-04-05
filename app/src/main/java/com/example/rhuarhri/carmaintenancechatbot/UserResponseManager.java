@@ -4,6 +4,7 @@ package com.example.rhuarhri.carmaintenancechatbot;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,25 +33,26 @@ import java.util.List;
 public class UserResponseManager {
 
     String UserResponse = "";
+    List<String> suggestionedResponses;
 
     List<chatResponse> chatHistory = new ArrayList<>();
     chatHistoryManager historyManager = new chatHistoryManager();
     RecyclerView.Adapter chatDisplayAdapter;
 
     documentMap documentHistory = new documentMap();
-    int userAttempts = 0;
+    unKnownResponseHandler unknownInput;
+
 
     Context context;
     RecyclerView chatRV;
-    Spinner suggestionSP;
-    EditText questionET;
+    suggestionDisplay suggestionDis;
 
     public UserResponseManager(Context appContext, RecyclerView ChatRV, Spinner SuggestionSP, EditText QuestionET)
     {
         context = appContext;
         chatRV = ChatRV;
-        suggestionSP = SuggestionSP;
-        questionET = QuestionET;
+        suggestionDis = new suggestionDisplay(appContext, SuggestionSP, QuestionET);
+        unknownInput = new unKnownResponseHandler(chatRV, context, suggestionDis);
 
     }
 
@@ -202,46 +204,10 @@ public class UserResponseManager {
     private void findResponse(List<String> cleanResponse)
     {
 
-        DocumentReference tempColl = null;
-        DocumentReference tempColl2 = null;
-
-        List<String> docList = documentHistory.getDocumentHistory();
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Query questionSearch = null;
-
-        if (docList.size() > 0) {
-            tempColl = db.collection("questions").document(docList.get(0));
-
-
-            for (int i = 1; i < docList.size(); i++) {
-                tempColl2 = tempColl.collection("questions").document(docList.get(i).toString());
-                tempColl = tempColl2;
-            }
-
-            questionSearch = tempColl.collection("questions").whereEqualTo("input." + cleanResponse.get(0), "");
-        }
-        else
-        {
-             questionSearch = db.collection("questions").whereEqualTo("input." + cleanResponse.get(0), "");
-        }
-
-
-        Query tempQuery = questionSearch;
-        Query questionSearch2 = questionSearch;
-
-
-
-        for (int i = 1; i < cleanResponse.size(); i++)
-        {
-            questionSearch2 = tempQuery.whereEqualTo("input." + cleanResponse.get(i), "");
-            tempQuery = questionSearch2;
-        }
-
-        Query responseBasedOn = questionSearch2;
-
-
+        QueryCreator newQuery = new QueryCreator(db);
+        Query responseBasedOn = newQuery.create(cleanResponse, documentHistory);
 
         responseBasedOn.get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -251,28 +217,26 @@ public class UserResponseManager {
                         if (task.isSuccessful()) {
                                 if(task.getResult().size() < 1)
                                 {
-                                    //no response found
-                                    String response = "I did not understand that could you try again";
 
-                                    userAttempts++;
+                                    //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
 
-                                    if (userAttempts >= 3)
+                                    boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestionedResponses);
+
+                                    if (reset)
                                     {
-                                        documentHistory = new documentMap();
-                                        response = "Sorry I still don't understand could you try once more "
-                                                + "I will try really hard this time.";
-                                        userAttempts = 0;
+                                        Log.d("RESET", "chat reset");
+                                        restChat();
                                     }
-
-                                    historyManager.addBotResponse(response, "sad", "", "");
-
-                                    chatHistory = historyManager.getHistory();
-
-                                    chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
-                                    chatRV.setAdapter(chatDisplayAdapter);
+                                    else
+                                    {
+                                        //documentHistory = unknownInput.returnDocumentHistory();
+                                        historyManager = unknownInput.returnChatHistory();
+                                    }
 
                                 }
                                 else {
+                                    unknownInput.reset();
+
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         String response = document.get("response").toString();
                                         String emotion = document.get("emotion").toString();
@@ -284,9 +248,13 @@ public class UserResponseManager {
                                             documentHistory.addDocument(document.getId());
                                         }
 
-                                        List<String> suggestions = (List<String>) document.get("suggestions");
-                                        getNewSpinnerAdapter(suggestions);
+                                        Log.d("SIZE", "" + documentHistory.getDocumentHistory().size());
+
+                                        suggestionedResponses = (List<String>) document.get("suggestions");
+                                        suggestionDis.getNewSpinnerAdapter(suggestionedResponses);
                                         historyManager.addBotResponse(response, emotion, image, imageDescription);
+
+                                        //unknownInput.addFallBackResponse(document.get("fallback").toString());
 
                                         chatHistory = historyManager.getHistory();
 
@@ -297,12 +265,9 @@ public class UserResponseManager {
                                         //go back to welcome message
                                         chatEnd(response);
 
-                                        userAttempts = 0;
                                     }
                                 }
-
                         }
-
                     }
                 });
         }
@@ -330,34 +295,7 @@ public class UserResponseManager {
         List<String> responseList = new ArrayList<String>();
         responseList.add("welcome");
         findResponse(responseList);
+        UserResponse = "welcome";
     }
 
-
-        private void getNewSpinnerAdapter(List<String> suggestions)
-        {
-            ArrayAdapter<String> adapter =  new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, suggestions);
-
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            suggestionSP.setAdapter(adapter);
-
-            suggestionSP.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    questionET.setText(suggestions.get(i));
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> adapterView) {
-
-                }
-            });
-        }
 }
-
-
-
-
-
-
-

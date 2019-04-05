@@ -139,8 +139,11 @@ public class MainActivity extends AppCompatActivity {
 
                 //List<String> importantWords = new ArrayList<>();
 
+                String userQuestion = userResponseET.getText().toString();
 
-                ResponseManager.search(userResponseET.getText().toString());
+                if(!userQuestion.isEmpty()) {
+                    ResponseManager.search(userQuestion);
+                }
 
                 //findResponse(null, chatDisplay);
 
