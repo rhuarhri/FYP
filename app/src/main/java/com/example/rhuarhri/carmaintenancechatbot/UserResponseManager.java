@@ -16,6 +16,7 @@ import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsump
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.documentMap;
+import com.example.rhuarhri.carmaintenancechatbot.voiceInteraction.voiceUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -32,20 +33,22 @@ import java.util.List;
 
 public class UserResponseManager {
 
-    String UserResponse = "";
-    List<String> suggestionedResponses;
+    private String UserResponse = "";
+    private List<String> suggestedResponses;
 
-    List<chatResponse> chatHistory = new ArrayList<>();
-    chatHistoryManager historyManager = new chatHistoryManager();
-    RecyclerView.Adapter chatDisplayAdapter;
+    private List<chatResponse> chatHistory = new ArrayList<>();
+    private chatHistoryManager historyManager = new chatHistoryManager();
+    private RecyclerView.Adapter chatDisplayAdapter;
 
-    documentMap documentHistory = new documentMap();
-    unKnownResponseHandler unknownInput;
+    private documentMap documentHistory = new documentMap();
+    private unKnownResponseHandler unknownInput;
 
 
-    Context context;
-    RecyclerView chatRV;
-    suggestionDisplay suggestionDis;
+    private Context context;
+    private RecyclerView chatRV;
+    private suggestionDisplay suggestionDis;
+
+    private voiceUI reader = new voiceUI();
 
     public UserResponseManager(Context appContext, RecyclerView ChatRV, Spinner SuggestionSP, EditText QuestionET)
     {
@@ -53,6 +56,7 @@ public class UserResponseManager {
         chatRV = ChatRV;
         suggestionDis = new suggestionDisplay(appContext, SuggestionSP, QuestionET);
         unknownInput = new unKnownResponseHandler(chatRV, context, suggestionDis);
+        reader.setupSpeaker(appContext);
 
     }
 
@@ -87,6 +91,11 @@ public class UserResponseManager {
 
         searchThread newThread  = new searchThread();
         newThread.run();
+    }
+
+    public void readResponse()
+    {
+        reader.speaker();
     }
 
     private void getResponse(String userResponse)
@@ -220,7 +229,7 @@ public class UserResponseManager {
 
                                     //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
 
-                                    boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestionedResponses);
+                                    boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestedResponses);
 
                                     if (reset)
                                     {
@@ -239,6 +248,7 @@ public class UserResponseManager {
 
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         String response = document.get("response").toString();
+                                        reader.setResponse(response);
                                         String emotion = document.get("emotion").toString();
                                         String image = document.get("image").toString();
                                         String imageDescription = document.get("description").toString();
@@ -250,8 +260,8 @@ public class UserResponseManager {
 
                                         Log.d("SIZE", "" + documentHistory.getDocumentHistory().size());
 
-                                        suggestionedResponses = (List<String>) document.get("suggestions");
-                                        suggestionDis.getNewSpinnerAdapter(suggestionedResponses);
+                                        suggestedResponses = (List<String>) document.get("suggestions");
+                                        suggestionDis.getNewSpinnerAdapter(suggestedResponses);
                                         historyManager.addBotResponse(response, emotion, image, imageDescription);
 
                                         //unknownInput.addFallBackResponse(document.get("fallback").toString());
@@ -297,5 +307,6 @@ public class UserResponseManager {
         findResponse(responseList);
         UserResponse = "welcome";
     }
+
 
 }

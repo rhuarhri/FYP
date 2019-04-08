@@ -1,6 +1,9 @@
 package com.example.rhuarhri.carmaintenancechatbot;
 
 import android.content.Intent;
+import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,10 +19,12 @@ import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsump
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
+import com.example.rhuarhri.carmaintenancechatbot.voiceInteraction.voiceUI;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 /*
 import com.crashlytics.android.answers.FirebaseAnalyticsEventMapper;
@@ -33,11 +38,9 @@ public class MainActivity extends AppCompatActivity {
     int placeInList = 1;
 
     EditText userResponseET;
-    Button sendUserResponseBTN;
-    Button editStatsBTN;
+
     RecyclerView chatDisplay;
-    RecyclerView.Adapter chatDisplayAdapter;
-    RecyclerView.LayoutManager chatDisplayLM;
+
     Spinner autoAnswersDisplay;
 
     List<chatResponse> chatHistory = new ArrayList<>();
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
     //StringBuilder fields = new StringBuilder("");
 
+    voiceUI listener = new voiceUI();
     UserResponseManager ResponseManager;
 
 
@@ -72,29 +76,26 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         chatDisplay = (RecyclerView) findViewById(R.id.chatDisplayRV);
-        chatDisplayLM = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager chatDisplayLM = new LinearLayoutManager(this);
         chatDisplay.setLayoutManager(chatDisplayLM);
-        chatDisplayAdapter = new chatRVAdapter(getApplicationContext(), chatHistory);
+        RecyclerView.Adapter chatDisplayAdapter = new chatRVAdapter(getApplicationContext(), chatHistory);
         chatDisplay.setAdapter(chatDisplayAdapter);
 
         autoAnswersDisplay = (Spinner) findViewById(R.id.autoAnswerSP);
 
-
         userResponseET = (EditText) findViewById(R.id.userResponseET);
-        sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
-        editStatsBTN = (Button) findViewById(R.id.editStatsBTN);
+        Button sendUserResponseBTN = (Button) findViewById(R.id.askBTN);
+        Button editStatsBTN = (Button) findViewById(R.id.editStatsBTN);
 
+        Button voiceBTN = (Button) findViewById(R.id.voiceBTN);
+        Button readBTN = (Button) findViewById(R.id.readBTN);
 
-
+        listener.setUpSpeechToText(getPackageManager());
         ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET);
 
         checkServiceHistory = new carServicing(getApplicationContext());
         checkFuelConsumption = new fuelConsumption(getApplicationContext());
-
-
 
         if(checkServiceHistory.carNeedsServicing() == true)
         {
@@ -117,9 +118,6 @@ public class MainActivity extends AppCompatActivity {
         {
             ResponseManager.search("welcome");
         }
-
-
-
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +161,43 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        voiceBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listener.speechToText() != null)
+                {
+                    startActivityForResult(listener.speechToText(), 10);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "This feature is not supported on this device", Toast.LENGTH_LONG).show();
 
+                }
+            }
+        });
+
+        readBTN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ResponseManager.readResponse();
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 10)
+        {
+            if (resultCode == RESULT_OK && data != null)
+            {
+                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                userResponseET.setText(result.get(0));
+            }
+        }
     }
 }
 
