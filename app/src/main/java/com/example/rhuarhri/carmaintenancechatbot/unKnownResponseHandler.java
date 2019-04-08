@@ -31,14 +31,16 @@ public class unKnownResponseHandler {
     private List<String> suggestedResponses;
 
     private String firstResponse =
-            "Sorry I did not understand that. I have a few suggestions listed above. "+
-                    "Do they match what you wanted to say. If could you repeat the question?";
+            "Sorry I did not understand that. I have a few suggestions listed below. "+
+                    "Do they match what you wanted to say. If not could you repeat the question?";
 
     private String secondResponse =
-            "So still don't understand. ";//TODO add something from the data base
+            "So, still don't understand. ";
 
     private String thirdResponse = "I was unable to fully understand the question. " +
             "So I am going restart this chat and hopefully a fresh start will fix this.";
+
+    private String response = "";
 
     public unKnownResponseHandler(RecyclerView ChatRV, Context appContext, suggestionDisplay SuggestionDis)
     {
@@ -55,7 +57,7 @@ public class unKnownResponseHandler {
     public boolean unKnownResponse(documentMap DocumentHistory, chatHistoryManager HistoryManager, List<String> SuggestedResponses)
     {
         //no response found
-        String response = "";
+
         boolean restartChat = false;
         documentHistory = DocumentHistory;
         historyManager = HistoryManager;
@@ -67,8 +69,8 @@ public class unKnownResponseHandler {
 
         if (userAttempts == 1)
         {
-            response = firstResponse;
-            displayResponse(response);
+
+            displayResponse(firstResponse);
             suggestionDis.getNewSpinnerAdapter(suggestedResponses);
         }
         else if (userAttempts == 2)
@@ -80,9 +82,9 @@ public class unKnownResponseHandler {
         else if (userAttempts >= 3)
         {
             documentHistory = new documentMap();
-            response = thirdResponse;
+
             userAttempts = 0;
-            displayResponse(response);
+            displayResponse(thirdResponse);
             restartChat = true;
         }
 
@@ -95,23 +97,20 @@ public class unKnownResponseHandler {
         return historyManager;
     }
 
-    public documentMap returnDocumentHistory()
-    {
-        return documentHistory;
-    }
+    public String returnResponse(){
 
-    public void addFallBackResponse(String FallBackResponse)
-    {
-        if (FallBackResponse.isEmpty())
+        if (userAttempts != 0)
         {
-            secondResponse = secondResponse + "Could you try again.";
+            return response;
         }
         else
         {
-            secondResponse = secondResponse + FallBackResponse;
+            //no error found
+            return "";
         }
 
     }
+
 
     private void getFallBackResponse()
     {
@@ -123,66 +122,45 @@ public class unKnownResponseHandler {
             QueryCreator getDatabasePath = new QueryCreator(db);
             DocumentReference FallbackQuery = getDatabasePath.createFallbackQuery(documentHistory);
 
-            FallbackQuery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if(task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        String fallBack;
-                        try {
-
-                            fallBack = document.get("fallback").toString();
-                        }
-                        catch (Exception e)
-                        {
-                            fallBack = "Could you try again.";
-                        }
-                        secondResponse = secondResponse + fallBack;
-                    }
-                    else {
-                        secondResponse = secondResponse + "Could you try again.";
-                    }
-                    displayResponse(secondResponse);
-                    suggestionDis.getNewSpinnerAdapter(suggestedResponses);
-
-                }
-            });
-
-
-                    /*
-
-                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
+            if (FallbackQuery != null) {
+                FallbackQuery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
                             String fallBack;
                             try {
 
                                 fallBack = document.get("fallback").toString();
-                            }
-                            catch (Exception e)
-                            {
+                            } catch (Exception e) {
                                 fallBack = "Could you try again.";
                             }
                             secondResponse = secondResponse + fallBack;
+                        } else {
+                            secondResponse = secondResponse + "Could you try again.";
                         }
+
+                        displayResponse(secondResponse);
+                        suggestionDis.getNewSpinnerAdapter(suggestedResponses);
+
                     }
-                    else {
-                        secondResponse = secondResponse + "Could you try again.";
-                    }
+                });
+            }
+            else
+            {
+                secondResponse = secondResponse + "Could you try again.";
 
+                displayResponse(secondResponse);
+                suggestionDis.getNewSpinnerAdapter(suggestedResponses);
+            }
 
-                }
-            });*/
-
-        //displayResponse(secondResponse);
-        //suggestionDis.getNewSpinnerAdapter(suggestedResponses);
 
     }
 
-    private void displayResponse(String response)
+    private void displayResponse(String Response)
     {
+        response = Response;
+
         historyManager.addBotResponse(response, "sad", "", "");
 
         List<chatResponse> chatHistory = historyManager.getHistory();

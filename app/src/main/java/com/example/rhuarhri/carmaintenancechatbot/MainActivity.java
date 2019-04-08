@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         {
             if (checkFuelConsumption.isFuelConsumptionNormal() == false)
             {
-                //fuel consumption higher than normal
+                ResponseManager.search("fuel consumption");
             }
             else
             {

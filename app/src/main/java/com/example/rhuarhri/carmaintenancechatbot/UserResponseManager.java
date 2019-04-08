@@ -95,7 +95,13 @@ public class UserResponseManager {
 
     public void readResponse()
     {
+        if (!unknownInput.returnResponse().equals(""))
+        {
+            reader.setResponse(unknownInput.returnResponse());
+        }
+
         reader.speaker();
+
     }
 
     private void getResponse(String userResponse)
@@ -238,7 +244,7 @@ public class UserResponseManager {
                                     }
                                     else
                                     {
-                                        //documentHistory = unknownInput.returnDocumentHistory();
+
                                         historyManager = unknownInput.returnChatHistory();
                                     }
 
