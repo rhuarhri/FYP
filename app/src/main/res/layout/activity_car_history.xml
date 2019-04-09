@@ -13,6 +13,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="fuel amount"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/introTXT" />
 
@@ -20,9 +21,10 @@
         android:id="@+id/mileageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="current mileage"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fuelAmountSB" />
 
@@ -40,15 +42,14 @@
 
     <Button
         android:id="@+id/saveBTN"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="save"
+        android:background="@drawable/save"
         app:layout_constraintBottom_toTopOf="@+id/infoTXT"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -60,6 +61,7 @@
         android:layout_marginEnd="8dp"
         android:text="Try and update this every time you put fuel into your car."
         android:textAlignment="center"
+        android:textColor="@color/primaryTextColor"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,6 +76,7 @@
         android:layout_marginBottom="8dp"
         android:text="It is important that you keep this up to date. Knowing a cars fuel consuption is used to identify problems. Knowing a cars mileage track wear in the car."
         android:textAlignment="center"
+        android:textColor="@color/primaryTextColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -95,6 +98,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=" 0 litres"
+        android:textColor="@color/primaryTextColor"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/fuelTitle"
         app:layout_constraintTop_toBottomOf="@+id/fuelTitle" />
