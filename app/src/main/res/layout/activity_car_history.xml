@@ -11,33 +11,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="24dp"
         android:text="fuel amount"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/distanceTBTN" />
-
-    <EditText
-        android:id="@+id/fuelET"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:ems="10"
-        android:inputType="number"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fuelTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/introTXT" />
 
     <TextView
         android:id="@+id/mileageTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:text="current mileage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fuelET" />
+        app:layout_constraintTop_toBottomOf="@+id/fuelAmountSB" />
 
     <EditText
         android:id="@+id/mileageET"
@@ -91,17 +78,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ToggleButton
-        android:id="@+id/distanceTBTN"
-        android:layout_width="wrap_content"
+    <SeekBar
+        android:id="@+id/fuelAmountSB"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:checked="false"
-        android:text="ToggleButton"
-        android:textOff="Distance in miles"
-        android:textOn="Distance in kilometers"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/introTXT" />
+        app:layout_constraintTop_toBottomOf="@+id/FuelAmountTXT" />
+
+    <TextView
+        android:id="@+id/FuelAmountTXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" 0 litres"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/fuelTitle"
+        app:layout_constraintTop_toBottomOf="@+id/fuelTitle" />
 
 </android.support.constraint.ConstraintLayout>

@@ -7,10 +7,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumption;
 import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsumptionTable;
+import com.example.rhuarhri.carmaintenancechatbot.carInfo.carInformation;
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carMileageTable;
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 
@@ -18,39 +21,68 @@ import java.util.Calendar;
 
 public class carHistoryActivity extends AppCompatActivity {
 
+    carInformation carInfo;
+
     EditText mileageET;
-    EditText fuelET;
+    SeekBar fuelAmountSB;
+    TextView fuelAmountDisplayTXT;
+    double currentFuelAmount;
 
     Button saveBTN;
-    ToggleButton distanceTBTN;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_history);
 
+        carInfo = new carInformation(getApplicationContext());
+        carInfo.getCarInfo();
+
         mileageET = (EditText) findViewById(R.id.mileageET);
-        fuelET = (EditText) findViewById(R.id.fuelET);
+        fuelAmountSB = (SeekBar) findViewById(R.id.fuelAmountSB);
+        fuelAmountDisplayTXT = (TextView) findViewById(R.id.FuelAmountTXT);
 
         saveBTN = (Button) findViewById(R.id.saveBTN);
-        distanceTBTN = (ToggleButton) findViewById(R.id.distanceTBTN);
+
 
         saveBTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveData(mileageET.getText().toString(), fuelET.getText().toString());
+                saveData(mileageET.getText().toString(), currentFuelAmount);
+            }
+        });
+
+        fuelAmountSB.setMax(carInfo.getCarFuelTankSize());
+
+        fuelAmountSB.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                fuelAmountDisplayTXT.setText(""+ i + " litres");
+                currentFuelAmount = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
             }
         });
 
     }
 
-    public void saveData(String newMileage, String newFuelAmount)
+
+    private void saveData(String newMileage, double newFuelAmount)
     {
 
         int mileage = 0;
-        double fuel = Double.parseDouble(newFuelAmount);
+        double fuel = newFuelAmount;
 
-        if (distanceTBTN.isChecked())
+        if (!carInfo.isInMiles())
         {
             mileage = Integer.parseInt(newMileage);
         }

@@ -12,14 +12,24 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+        <activity android:name=".carHistoryActivity" />
+        <activity
+            android:name=".savedDataActivity"
+            android:noHistory="true" />
+        <activity android:name=".startActivity" android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".carHistoryActivity" />
-        <activity android:name=".savedDataActivity" android:noHistory="true"></activity>
+        <activity android:name=".setupActivity" android:noHistory="true"></activity>
     </application>
 
 </manifest>

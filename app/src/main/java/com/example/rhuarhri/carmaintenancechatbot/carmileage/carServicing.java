@@ -33,6 +33,24 @@ public class carServicing {
 
     }
 
+    public boolean setUpRequired()
+    {
+        if(addMileage.dbInterface().rowsInDataBase() <= 0)
+        {
+            //no data in data base
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void runSetUp(int mileage)
+    {
+        carNotServiced(mileage);
+    }
+
     public void carNotServiced(int mileage)
     {
         addServiceHistory = new carMileageTable();
