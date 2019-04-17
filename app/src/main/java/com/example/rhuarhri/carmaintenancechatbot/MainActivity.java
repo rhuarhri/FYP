@@ -20,6 +20,8 @@ import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsump
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.blackListManager;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.setupManager;
 import com.example.rhuarhri.carmaintenancechatbot.voiceInteraction.voiceUI;
 
 import java.util.ArrayList;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             .setPersistenceEnabled(true)
             .build();*/
 
-    String response = "";
+    //String response = "";
 
 
     //String Testresults = "a";
@@ -93,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
         Button readBTN = (Button) findViewById(R.id.readBTN);
 
         listener.setUpSpeechToText(getPackageManager());
-        ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET);
+        Intent sentData = getIntent();
+        ResponseManager = new UserResponseManager(getApplicationContext(), chatDisplay, autoAnswersDisplay, userResponseET, sentData);
 
         checkServiceHistory = new carServicing(getApplicationContext());
         checkFuelConsumption = new fuelConsumption(getApplicationContext());
@@ -101,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         if(checkServiceHistory.carNeedsServicing() == true)
         {
             ResponseManager.search("servicing");
-            Log.d("response", "service");
+            //Log.d("response", "service");
             checkServiceHistory.carServiced();
 
         }
@@ -111,18 +114,18 @@ public class MainActivity extends AppCompatActivity {
             if (checkFuelConsumption.isFuelConsumptionNormal() == false)
             {
                 ResponseManager.search("fuel consumption");
-                Log.d("response", "fuel");
+                //Log.d("response", "fuel");
             }
             else
             {
                 ResponseManager.search("welcome");
-                Log.d("response", "hi");
+                //Log.d("response", "hi");
             }
         }
         else
         {
             ResponseManager.search("welcome");
-            Log.d("response", "hi");
+            //Log.d("response", "hi");
         }
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {

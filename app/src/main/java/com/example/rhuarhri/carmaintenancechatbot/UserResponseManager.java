@@ -2,6 +2,7 @@ package com.example.rhuarhri.carmaintenancechatbot;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,6 +17,11 @@ import com.example.rhuarhri.carmaintenancechatbot.carFuelConsumption.fuelConsump
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatHistoryManager;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.chatResponse;
 import com.example.rhuarhri.carmaintenancechatbot.chathistory.documentMap;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.blackListManager;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.characterListManager;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.setupManager;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.whiteListManager;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.wordMeaningListManager;
 import com.example.rhuarhri.carmaintenancechatbot.voiceInteraction.voiceUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +38,22 @@ import java.util.List;
 
 
 public class UserResponseManager {
+
+    private FirebaseFirestore db;
+
+    private blackListManager blackListM;
+    private characterListManager characterListM;
+    private whiteListManager whiteListM;
+    private wordMeaningListManager WMLManager;
+    //private List ofCharacters = new ArrayList<String>();
+    //private List blackList = new ArrayList<String>();
+    //private List whiteList = new ArrayList<String>();
+    //private List importantWords = new ArrayList<String>();
+    private List cleanResponse = new ArrayList<String>();
+    private List wordsFound = new ArrayList<String>();
+    private List unsimplifiedResponse = new ArrayList<String>();
+    //private List<baseMeaning> simplifications = new ArrayList<baseMeaning>();
+
 
     private String UserResponse = "";
     private List<String> suggestedResponses;
@@ -50,20 +72,29 @@ public class UserResponseManager {
 
     private voiceUI reader = new voiceUI();
 
-    public UserResponseManager(Context appContext, RecyclerView ChatRV, Spinner SuggestionSP, EditText QuestionET)
+    public UserResponseManager(Context appContext, RecyclerView ChatRV, Spinner SuggestionSP, EditText QuestionET, Intent sentData)
     {
+        db = FirebaseFirestore.getInstance();
+
         context = appContext;
         chatRV = ChatRV;
         suggestionDis = new suggestionDisplay(appContext, SuggestionSP, QuestionET);
         unknownInput = new unKnownResponseHandler(chatRV, context, suggestionDis);
         reader.setupSpeaker(appContext);
+        setUpDataFromFireStore(sentData, appContext);
 
     }
 
-    //TODO figure out how the documentHistory is effected by users inputting the wrong data
-    //idea
-    //set number of times that the user can response before the app
-    //starts from scratch
+    private void setUpDataFromFireStore(Intent sentData, Context appContext)
+    {
+        setupManager setupM = new setupManager(appContext);
+        setupM.getObjectsFromIntent(sentData);
+        blackListM = setupM.getBlackListManager();
+        characterListM = setupM.getCharacterListMananager();
+        whiteListM = setupM.getWhiteListManager();
+        WMLManager = setupM.getWordMeaningListManager();
+    }
+
 
     public void search(String userResponse)
     {
@@ -106,25 +137,284 @@ public class UserResponseManager {
 
     private void getResponse(String userResponse)
     {
-        List ofCharacters = new ArrayList<String>();
 
-        List blackList = new ArrayList<String>();
-
-        List whiteList = new ArrayList<String>();
-
-        List importantWords = new ArrayList<String>();
-
-        List cleanResponse = new ArrayList<String>();
-
-        List wordsFound = new ArrayList<String>();
-
+        /*
+        Step 1 convert all the response to lower case
+         */
         String inputString = userResponse.toLowerCase();
 
+        /*
+        Step 2 split the response into single word chunks
+        */
         String[] responseArray = inputString.split("\\ ", -1);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("characters").get()
+        wordsFound = new ArrayList<String>();
+        unsimplifiedResponse = new ArrayList<String>();
+
+        for (int i = 0; responseArray.length > i; i++) {
+
+            /*
+            Step 3 check that characters are related to grammar such as ! ?
+            and removes them
+             */
+            String currentWord = removeUseless(responseArray[i], characterListM.getCharacterList());
+
+            wordsFound.add(currentWord);
+        }
+
+        for (int i = 0; responseArray.length > i; i++) {
+
+            /*
+            Step 4 check that found words are useless or linking words linking like and or the
+            and removes them
+             */
+            if (blackListM.getBlackList().contains(wordsFound.get(i).toString())) {
+
+            } else {
+                //cleanResponse.add(wordsFound.get(i));
+                unsimplifiedResponse.add(wordsFound.get(i));
+            }
+        }
+
+        List<String> responseWithMeaning = new ArrayList<String>();
+
+
+        for (int i = 0; i < unsimplifiedResponse.size(); i++) {
+            String meaning = "";
+
+            /*
+            Step 5 check if word is in white list and if so jumps step 6
+             */
+            if(!whiteListM.getWhiteList().contains(unsimplifiedResponse.get(i)))
+            {
+                for (int it = 0; it < WMLManager.getSimplifications().size(); it++) {
+                    for (int iter = 0; iter < WMLManager.getWordList(it).size(); iter++) {
+
+                        /*
+                        Step 6 find if the current word can be simplified for example vam and be simplified to car
+                         */
+                        if (unsimplifiedResponse.get(i).toString().equals(WMLManager.getWordList(it).get(iter).toString())) {
+                            meaning = WMLManager.getMeaning(it);
+                            break;
+                        } else { }
+                }
+
+            }
+            }
+
+            if (meaning.equals(""))
+            {
+                meaning = unsimplifiedResponse.get(i).toString();
+            }
+
+            responseWithMeaning.add(meaning);
+        }
+
+        String editedResponse = "";
+        for (int test = 0; test < responseWithMeaning.size(); test++)
+        {
+            //Log.d("TEST", "test is " + test + " string chunk is " + responseWithMeaning.get(test));
+            editedResponse = editedResponse + " " + responseWithMeaning.get(test);
+        }
+
+        Log.d("EDITED RESPONSE", ""+ editedResponse);
+
+
+        findResponse(responseWithMeaning);
+
+    }
+
+    private String removeUseless(String currentWord, List<String> ofCharacters)
+    {
+
+        String cleanString;
+        String dirtyString = currentWord;
+
+        for (int i = 0; ofCharacters.size() > i; i++)
+        {
+            dirtyString = dirtyString.replace(""+ofCharacters.get(i), "");
+        }
+
+        cleanString = dirtyString;
+
+        return cleanString;
+    }
+
+
+    private void findResponse(List<String> cleanResponse)
+    {
+
+
+        QueryCreator newQuery = new QueryCreator(db);
+        Query responseBasedOn = newQuery.create(cleanResponse, documentHistory);
+
+        responseBasedOn.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+                                if(task.getResult().size() < 1)
+                                {
+
+                                    //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
+
+                                    boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestedResponses);
+
+                                    if (reset)
+                                    {
+                                        //Log.d("RESET", "chat reset");
+                                        restChat();
+                                    }
+                                    else
+                                    {
+
+                                        historyManager = unknownInput.returnChatHistory();
+                                    }
+
+                                }
+                                else {
+                                    unknownInput.reset();
+
+                                    //for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                                        String response = document.get("response").toString();
+                                        reader.setResponse(response);
+                                        String emotion = document.get("emotion").toString();
+                                        String image = document.get("image").toString();
+                                        String imageDescription = document.get("description").toString();
+
+                                        //welcome auto generated message and should be ignored
+                                        if (UserResponse != "welcome") {
+                                            documentHistory.addDocument(document.getId());
+                                        }
+
+                                        //Log.d("SIZE", "" + documentHistory.getDocumentHistory().size());
+
+                                        suggestedResponses = (List<String>) document.get("suggestions");
+                                        suggestionDis.getNewSpinnerAdapter(suggestedResponses);
+                                        historyManager.addBotResponse(response, emotion, image, imageDescription);
+
+                                        //unknownInput.addFallBackResponse(document.get("fallback").toString());
+
+                                        chatHistory = historyManager.getHistory();
+
+                                        chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
+                                        chatRV.setAdapter(chatDisplayAdapter);
+
+                                        chatRV.smoothScrollToPosition(chatRV.getAdapter().getItemCount() +2);
+
+
+                                        //go back to welcome message
+                                        chatEnd(response);
+
+                                    //}
+                                }
+                        }
+                    }
+                });
+        }
+
+    private void chatEnd(String response)
+    {
+        if (response.equals("fuel null"))
+        {
+            //reset fuel consumption data
+            fuelConsumption rest = new fuelConsumption(context);
+            rest.resetFuelConsumption();
+            restChat();
+        }
+        if (response.equals("null"))
+        {
+            restChat();
+        }
+
+    }
+
+    private void restChat()
+    {
+        documentHistory = new documentMap();
+        historyManager = new chatHistoryManager();
+        List<String> responseList = new ArrayList<String>();
+        responseList.add("welcome");
+        findResponse(responseList);
+        UserResponse = "welcome";
+    }
+
+
+}
+
+/**PAST code*/
+
+/*
+    private void lemmatization()
+    {
+
+
+        db.collection("meanings").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                baseMeaning wordSimplifiesTo = document.toObject(baseMeaning.class);
+                                simplifications.add(wordSimplifiesTo);
+
+                            }
+
+                            List<String> responseWithMeaning = new ArrayList<String>();
+                            String meaning = "";
+
+                            for (int i = 0; i < unsimplifiedResponse.size(); i++) {
+
+
+                                for (int it = 0; it < simplifications.size(); it++)
+                                {
+                                    for(int iter = 0; iter < simplifications.get(it).getWords().size(); iter++)
+                                    {
+
+                                        if (unsimplifiedResponse.get(i).toString().equals(simplifications.get(it).getWords().get(iter).toString()))
+                                        {
+                                            meaning = simplifications.get(it).getMeaning();
+                                            break;
+                                        }
+                                        else
+                                        {
+
+                                        }
+                                    }
+
+                                }
+
+                                if (meaning.equals(""))
+                                {
+                                    meaning = unsimplifiedResponse.get(i).toString();
+                                }
+
+                                responseWithMeaning.add(meaning);
+                            }
+
+                            for (int test = 0; test < unsimplifiedResponse.size(); test++)
+                            {
+                                Log.d("WORD MEANING", ""+ unsimplifiedResponse.get(test) + " means " + responseWithMeaning.get(test));
+                            }
+
+
+                            //findResponse(cleanResponse);
+
+                        }
+                    }
+                });
+    }*/
+
+
+/*
+
+db.collection("characters").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -160,11 +450,13 @@ public class UserResponseManager {
                                                     if (blackList.contains(wordsFound.get(i)) == true) {
 
                                                     } else {
-                                                        cleanResponse.add(wordsFound.get(i));
+                                                        //cleanResponse.add(wordsFound.get(i));
+                                                        unsimplifiedResponse.add(wordsFound.get(i));
                                                     }
                                                 }
 
-                                                findResponse(cleanResponse);
+                                                //findResponse(cleanResponse);
+                                                lemmatization();
 
 
                                             }
@@ -194,127 +486,70 @@ public class UserResponseManager {
 
                                             }
                                         }
-                        });*/
+                        });*
                         }
-                    }});
+                                }});
 
-    }
 
-    private String removeUseless(String currentWord, List<String> ofCharacters)
-    {
 
-        String cleanString;
-        String dirtyString = currentWord;
 
-        for (int i = 0; ofCharacters.size() > i; i++)
-        {
-            dirtyString = dirtyString.replace(""+ofCharacters.get(i), "");
-        }
-
-        cleanString = dirtyString;
-
-        return cleanString;
-    }
-
-    private void findResponse(List<String> cleanResponse)
-    {
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        QueryCreator newQuery = new QueryCreator(db);
-        Query responseBasedOn = newQuery.create(cleanResponse, documentHistory);
-
-        responseBasedOn.get()
+        db.collection("meanings").get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-
                         if (task.isSuccessful()) {
-                                if(task.getResult().size() < 1)
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                baseMeaning wordSimplifiesTo = document.toObject(baseMeaning.class);
+                                simplifications.add(wordSimplifiesTo);
+
+                            }
+
+                            List<String> responseWithMeaning = new ArrayList<String>();
+                            String meaning = "";
+
+                            for (int i = 0; i < unsimplifiedResponse.size(); i++) {
+
+
+                                for (int it = 0; it < simplifications.size(); it++)
                                 {
-
-                                    //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
-
-                                    boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestedResponses);
-
-                                    if (reset)
-                                    {
-                                        Log.d("RESET", "chat reset");
-                                        restChat();
-                                    }
-                                    else
+                                    for(int iter = 0; iter < simplifications.get(it).getWords().size(); iter++)
                                     {
 
-                                        historyManager = unknownInput.returnChatHistory();
-                                    }
-
-                                }
-                                else {
-                                    unknownInput.reset();
-
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        String response = document.get("response").toString();
-                                        reader.setResponse(response);
-                                        String emotion = document.get("emotion").toString();
-                                        String image = document.get("image").toString();
-                                        String imageDescription = document.get("description").toString();
-
-                                        //welcome auto generated message and should be ignored
-                                        if (UserResponse != "welcome") {
-                                            documentHistory.addDocument(document.getId());
+                                        if (unsimplifiedResponse.get(i).toString().equals(simplifications.get(it).getWords().get(iter).toString()))
+                                        {
+                                            meaning = simplifications.get(it).getMeaning();
+                                            break;
                                         }
+                                        else
+                                        {
 
-                                        Log.d("SIZE", "" + documentHistory.getDocumentHistory().size());
-
-                                        suggestedResponses = (List<String>) document.get("suggestions");
-                                        suggestionDis.getNewSpinnerAdapter(suggestedResponses);
-                                        historyManager.addBotResponse(response, emotion, image, imageDescription);
-
-                                        //unknownInput.addFallBackResponse(document.get("fallback").toString());
-
-                                        chatHistory = historyManager.getHistory();
-
-                                        chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
-                                        chatRV.setAdapter(chatDisplayAdapter);
-
-                                        chatRV.smoothScrollToPosition(chatRV.getAdapter().getItemCount() +2);
-
-
-                                        //go back to welcome message
-                                        chatEnd(response);
-
+                                        }
                                     }
+
                                 }
+
+                                if (meaning.equals(""))
+                                {
+                                    meaning = unsimplifiedResponse.get(i).toString();
+                                }
+
+                                responseWithMeaning.add(meaning);
+                            }
+
+                            for (int test = 0; test < unsimplifiedResponse.size(); test++)
+                            {
+                                Log.d("WORD MEANING", ""+ unsimplifiedResponse.get(test) + " means " + responseWithMeaning.get(test));
+                            }
+
+
+                            //findResponse(cleanResponse);
+
                         }
                     }
                 });
-        }
-
-    private void chatEnd(String response)
-    {
-        if (response.equals("fuel null"))
-        {
-            //reset fuel consumption data
-            fuelConsumption rest = new fuelConsumption(context);
-            rest.resetFuelConsumption();
-            restChat();
-        }
-        if (response.equals("null"))
-        {
-            restChat();
-        }
-
-    }
-
-    private void restChat()
-    {
-        documentHistory = new documentMap();
-        historyManager = new chatHistoryManager();
-        List<String> responseList = new ArrayList<String>();
-        responseList.add("welcome");
-        findResponse(responseList);
-        UserResponse = "welcome";
-    }
 
 
-}
+
+ */

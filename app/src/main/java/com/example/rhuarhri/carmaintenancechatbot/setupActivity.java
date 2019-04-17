@@ -10,8 +10,11 @@ import android.widget.RadioButton;
 
 import com.example.rhuarhri.carmaintenancechatbot.carInfo.carInformation;
 import com.example.rhuarhri.carmaintenancechatbot.carmileage.carServicing;
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.setupManager;
 
 public class setupActivity extends AppCompatActivity {
+
+    setupManager setupM;
 
     Button saveBTN;
     RadioButton InKilometresBTN;
@@ -31,6 +34,10 @@ public class setupActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+
+        setupM = new setupManager(getApplicationContext());
+
+        setupM.setup();
 
         setupServicing = new carServicing(getApplicationContext());
         recordedCarInfo = new carInformation(getApplicationContext());
@@ -92,7 +99,7 @@ public class setupActivity extends AppCompatActivity {
 
     private void nextScreen()
     {
-        Intent goToHomeScreen = new Intent(getApplicationContext(), MainActivity.class);
+        Intent goToHomeScreen = setupM.getMainScreenIntent();//new Intent(getApplicationContext(), MainActivity.class);
         startActivity(goToHomeScreen);
     }
 }
