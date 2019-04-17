@@ -277,6 +277,8 @@ public class UserResponseManager {
                                         chatDisplayAdapter = new chatRVAdapter(context, chatHistory);
                                         chatRV.setAdapter(chatDisplayAdapter);
 
+                                        chatRV.smoothScrollToPosition(chatRV.getAdapter().getItemCount() +2);
+
 
                                         //go back to welcome message
                                         chatEnd(response);

@@ -3,6 +3,7 @@ package com.example.rhuarhri.carmaintenancechatbot;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +23,7 @@ import java.util.Calendar;
 public class carHistoryActivity extends AppCompatActivity {
 
     carInformation carInfo;
+    carServicing addCarServicing;
 
     EditText mileageET;
     SeekBar fuelAmountSB;
@@ -30,16 +32,20 @@ public class carHistoryActivity extends AppCompatActivity {
 
     Button saveBTN;
 
+    private dataConverter converter = new dataConverter();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car_history);
 
+        addCarServicing = new carServicing(getApplicationContext());
         carInfo = new carInformation(getApplicationContext());
         carInfo.getCarInfo();
 
         mileageET = (EditText) findViewById(R.id.mileageET);
+        mileageET.setText(""+displayMileage());
         fuelAmountSB = (SeekBar) findViewById(R.id.fuelAmountSB);
         fuelAmountDisplayTXT = (TextView) findViewById(R.id.FuelAmountTXT);
 
@@ -75,6 +81,19 @@ public class carHistoryActivity extends AppCompatActivity {
 
     }
 
+    private int displayMileage()
+    {
+        int distance = addCarServicing.getCurrentMileage();
+        Log.d("DISTANCE", ""+ distance);
+
+        if (carInfo.isInMiles())
+        {
+            distance = converter.convertToMiles(distance);
+        }
+
+        return distance;
+    }
+
 
     private void saveData(String newMileage, double newFuelAmount)
     {
@@ -88,10 +107,10 @@ public class carHistoryActivity extends AppCompatActivity {
         }
         else
         {
-            mileage = convertToKilometers(Integer.parseInt(newMileage));
+            mileage = converter.convertToKilometers(Integer.parseInt(newMileage));
         }
 
-        carServicing addCarServicing = new carServicing(getApplicationContext());
+
 
         addCarServicing.carNotServiced(mileage);
 
@@ -105,10 +124,5 @@ public class carHistoryActivity extends AppCompatActivity {
 
     }
 
-    private int convertToKilometers(int distance)
-    {
-        int inKilometers = (int) Math.round(distance * 1.60934);
 
-        return inKilometers;
-    }
 }

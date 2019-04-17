@@ -7,6 +7,8 @@ import android.util.Log;
 //import com.example.rhuarhri.carmaintenancechatbot.carmileage.carMileageTable;
 //import com.example.rhuarhri.carmaintenancechatbot.carmileage.databaseController;
 
+import com.example.rhuarhri.carmaintenancechatbot.dataConverter;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +23,8 @@ public class carServicing {
     private carMileageTable addServiceHistory;
     private databaseController addMileage;
 
+    private dataConverter converter = new dataConverter();
+
     public carServicing(Context context)
     {
         addMileage = Room.databaseBuilder(context, databaseController.class, "carMileageHistory")
@@ -31,6 +35,11 @@ public class carServicing {
         lastService = addMileage.dbInterface().getServiceHistoryDate();
         mileageSinceLastService = addMileage.dbInterface().getServiceHistoryMileage();
 
+    }
+
+    public int getCurrentMileage()
+    {
+        return Mileage;
     }
 
     public boolean setUpRequired()
@@ -49,6 +58,8 @@ public class carServicing {
     public void runSetUp(int mileage)
     {
         carNotServiced(mileage);
+        Mileage = addMileage.dbInterface().getLatestMileage();
+        carServiced();
     }
 
     public void carNotServiced(int mileage)
@@ -74,6 +85,8 @@ public class carServicing {
 
         addMileage.dbInterface().addMileage(addServiceHistory);
 
+        Log.e("MESSAGE", "car serviced");
+
     }
 
     public boolean carNeedsServicing()
@@ -81,16 +94,21 @@ public class carServicing {
 
         boolean needsServicing = false;
 
-        Date currentDate = Calendar.getInstance().getTime();
+        long currentDate = Calendar.getInstance().getTime().getTime();
 
-        long difference = currentDate.getTime() - lastService;
-        double daysDifference = (difference / (1000*60*60*24));
+        long daysDifference = converter.convertToDays((currentDate - lastService));
 
+        //Log.d("DATE", "current Date is " + currentDate);
+        //Log.d("MESSAGE", "mileage since last service is " + mileageSinceLastService);
+        Log.d("DATE", "Date difference is "+ daysDifference);
 
         int mileageDifference = Mileage - mileageSinceLastService;
+        Log.d("MILEAGE", "current mileage is " + Mileage);
+        Log.d("MILEAGE", "mileage since last service is " + mileageSinceLastService);
+        Log.d("MILEAGE", "mileage difference is "+ mileageDifference);
 
-        if (addMileage.dbInterface().rowsInDataBase() <= 0) {
-            if (mileageDifference > 6000) {
+        if (addMileage.dbInterface().rowsInDataBase() > 0) {
+            if (mileageDifference > 97000) { //which is about 6000 miles
                 needsServicing = true;
                 Log.e("MESSAGE", "mileage difference greater than 6000");
 

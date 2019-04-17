@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -100,23 +101,28 @@ public class MainActivity extends AppCompatActivity {
         if(checkServiceHistory.carNeedsServicing() == true)
         {
             ResponseManager.search("servicing");
+            Log.d("response", "service");
             checkServiceHistory.carServiced();
 
         }
-        else if((Calendar.getInstance().getTime().getTime() / (1000*60*60*24) % 100) == 0)
+        //check fuel consumption every 100 days because fuel consumption may vary from day to day in a normal car
+        else if(((Calendar.getInstance().getTime().getTime() / (1000*60*60*24)) % 100) == 0)
         {
             if (checkFuelConsumption.isFuelConsumptionNormal() == false)
             {
                 ResponseManager.search("fuel consumption");
+                Log.d("response", "fuel");
             }
             else
             {
                 ResponseManager.search("welcome");
+                Log.d("response", "hi");
             }
         }
         else
         {
             ResponseManager.search("welcome");
+            Log.d("response", "hi");
         }
 
         sendUserResponseBTN.setOnClickListener(new View.OnClickListener() {

@@ -25,6 +25,8 @@ public class setupActivity extends AppCompatActivity {
     private int fuelTankSize = 0;
     private boolean inMiles = false;
 
+    private dataConverter converter = new dataConverter();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,11 +71,22 @@ public class setupActivity extends AppCompatActivity {
             inMiles = false;
         }
 
+        if(!InKilometresBTN.isChecked() && !InMilesBTN.isChecked())
+        {
+            inMiles = false;
+        }
+
     }
 
     private void addData()
     {
-        setupServicing.runSetUp(distance);
+        int distanceInKm = distance;
+
+        if(inMiles) {
+            distanceInKm = converter.convertToKilometers(distance);
+        }
+
+        setupServicing.runSetUp(distanceInKm);
         recordedCarInfo.addCarInfo(fuelTankSize, inMiles);
     }
 
