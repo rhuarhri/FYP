@@ -33,12 +33,12 @@ public class QueryCreator {
 
         if (documentHistory.getDocumentHistory().size() > 0)
         {
-            Log.d("SIZE", "Not empty");
+            //Log.d("SIZE", "Not empty");
             returnedQuery = databasePath.collection("questions").whereEqualTo("input." + cleanResponse.get(0), "");
         }
         else
         {
-            Log.d("SIZE", "empty");
+            //Log.d("SIZE", "empty");
             returnedQuery = db.collection("questions").whereEqualTo("input." + cleanResponse.get(0), "");
         }
 

@@ -5,34 +5,41 @@ import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.example.rhuarhri.carmaintenancechatbot.externalDatabase.setupManager;
+
 public class savedDataActivity extends AppCompatActivity {
+
+    setupManager setupM;
+    timer screenTimer = new timer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_data);
 
-        notificationTimer();
+        setupM = new setupManager(getApplicationContext());
+
+        setupM.setup();
+
+        screenTimer.start();
     }
 
-    private void notificationTimer()
-    {
-        CountDownTimer timer = new CountDownTimer(8000, 8000) {
-            @Override
-            public void onTick(long l) {
+    private class timer extends Thread {
 
-            }
-
-            @Override
-            public void onFinish() {
+        public void run()
+        {
+            try {
+                Thread.sleep(5000);
                 showHomeScreen();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }.start();
+        }
     }
 
     private void showHomeScreen()
     {
-        Intent goToHomeScreen = new Intent(getApplicationContext(), MainActivity.class);
+        Intent goToHomeScreen = setupM.getMainScreenIntent();
 
         startActivity(goToHomeScreen);
     }

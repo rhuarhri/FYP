@@ -25,20 +25,6 @@ public class startActivity extends AppCompatActivity {
 
         screenTimer.start();
 
-        /*
-        CountDownTimer wait = new CountDownTimer(5000, 5000) {
-            @Override
-            public void onTick(long l) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                chooseScreen();
-            }
-        }.start();*/
-
-
     }
 
     private void chooseScreen()
@@ -52,7 +38,7 @@ public class startActivity extends AppCompatActivity {
         }
         else
         {
-            chosenScreen = setupM.getMainScreenIntent();//new Intent(getApplicationContext(), MainActivity.class);
+            chosenScreen = setupM.getMainScreenIntent();
         }
 
         startActivity(chosenScreen);

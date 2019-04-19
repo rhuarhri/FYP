@@ -99,7 +99,7 @@ public class setupActivity extends AppCompatActivity {
 
     private void nextScreen()
     {
-        Intent goToHomeScreen = setupM.getMainScreenIntent();//new Intent(getApplicationContext(), MainActivity.class);
+        Intent goToHomeScreen = setupM.getMainScreenIntent();
         startActivity(goToHomeScreen);
     }
 }
