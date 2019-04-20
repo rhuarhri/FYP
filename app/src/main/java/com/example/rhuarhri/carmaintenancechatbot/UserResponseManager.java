@@ -45,14 +45,9 @@ public class UserResponseManager {
     private characterListManager characterListM;
     private whiteListManager whiteListM;
     private wordMeaningListManager WMLManager;
-    //private List ofCharacters = new ArrayList<String>();
-    //private List blackList = new ArrayList<String>();
-    //private List whiteList = new ArrayList<String>();
-    //private List importantWords = new ArrayList<String>();
     private List cleanResponse = new ArrayList<String>();
     private List wordsFound = new ArrayList<String>();
     private List unsimplifiedResponse = new ArrayList<String>();
-    //private List<baseMeaning> simplifications = new ArrayList<baseMeaning>();
 
 
     private String UserResponse = "";
@@ -172,7 +167,7 @@ public class UserResponseManager {
             if (blackListM.getBlackList().contains(wordsFound.get(i).toString())) {
 
             } else {
-                //cleanResponse.add(wordsFound.get(i));
+
                 unsimplifiedResponse.add(wordsFound.get(i));
             }
         }
@@ -214,11 +209,11 @@ public class UserResponseManager {
         String editedResponse = "";
         for (int test = 0; test < responseWithMeaning.size(); test++)
         {
-            //Log.d("TEST", "test is " + test + " string chunk is " + responseWithMeaning.get(test));
+
             editedResponse = editedResponse + " " + responseWithMeaning.get(test);
         }
 
-        Log.d("EDITED RESPONSE", ""+ editedResponse);
+
 
 
         findResponse(responseWithMeaning);
@@ -258,13 +253,12 @@ public class UserResponseManager {
                                 if(task.getResult().size() < 1)
                                 {
 
-                                    //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
 
                                     boolean reset = unknownInput.unKnownResponse(documentHistory, historyManager, suggestedResponses);
 
                                     if (reset)
                                     {
-                                        //Log.d("RESET", "chat reset");
+
                                         restChat();
                                     }
                                     else
@@ -277,7 +271,7 @@ public class UserResponseManager {
                                 else {
                                     unknownInput.reset();
 
-                                    //for (QueryDocumentSnapshot document : task.getResult()) {
+
 
                                         DocumentSnapshot document = task.getResult().getDocuments().get(0);
                                         String response = document.get("response").toString();
@@ -291,13 +285,12 @@ public class UserResponseManager {
                                             documentHistory.addDocument(document.getId());
                                         }
 
-                                        //Log.d("SIZE", "" + documentHistory.getDocumentHistory().size());
+
 
                                         suggestedResponses = (List<String>) document.get("suggestions");
                                         suggestionDis.getNewSpinnerAdapter(suggestedResponses);
                                         historyManager.addBotResponse(response, emotion, image, imageDescription);
 
-                                        //unknownInput.addFallBackResponse(document.get("fallback").toString());
 
                                         chatHistory = historyManager.getHistory();
 
@@ -310,7 +303,7 @@ public class UserResponseManager {
                                         //go back to welcome message
                                         chatEnd(response);
 
-                                    //}
+
                                 }
                         }
                     }
@@ -343,213 +336,4 @@ public class UserResponseManager {
         UserResponse = "welcome";
     }
 
-
 }
-
-/**PAST code*/
-
-/*
-    private void lemmatization()
-    {
-
-
-        db.collection("meanings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                baseMeaning wordSimplifiesTo = document.toObject(baseMeaning.class);
-                                simplifications.add(wordSimplifiesTo);
-
-                            }
-
-                            List<String> responseWithMeaning = new ArrayList<String>();
-                            String meaning = "";
-
-                            for (int i = 0; i < unsimplifiedResponse.size(); i++) {
-
-
-                                for (int it = 0; it < simplifications.size(); it++)
-                                {
-                                    for(int iter = 0; iter < simplifications.get(it).getWords().size(); iter++)
-                                    {
-
-                                        if (unsimplifiedResponse.get(i).toString().equals(simplifications.get(it).getWords().get(iter).toString()))
-                                        {
-                                            meaning = simplifications.get(it).getMeaning();
-                                            break;
-                                        }
-                                        else
-                                        {
-
-                                        }
-                                    }
-
-                                }
-
-                                if (meaning.equals(""))
-                                {
-                                    meaning = unsimplifiedResponse.get(i).toString();
-                                }
-
-                                responseWithMeaning.add(meaning);
-                            }
-
-                            for (int test = 0; test < unsimplifiedResponse.size(); test++)
-                            {
-                                Log.d("WORD MEANING", ""+ unsimplifiedResponse.get(test) + " means " + responseWithMeaning.get(test));
-                            }
-
-
-                            //findResponse(cleanResponse);
-
-                        }
-                    }
-                });
-    }*/
-
-
-/*
-
-db.collection("characters").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                ofCharacters.add(document.get("character").toString());
-                            }
-
-                            for (int i = 0; responseArray.length > i; i++) {
-
-                                String currentWord = removeUseless(responseArray[i], ofCharacters);
-
-                                wordsFound.add(currentWord);
-                            }
-
-                            db.collection("black list").get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                                    blackList.add(document.get("word").toString());
-                                                }
-
-                                                for (int i = 0; responseArray.length > i; i++) {
-
-
-
-                                                    if (blackList.contains(wordsFound.get(i)) == true) {
-
-                                                    } else {
-                                                        //cleanResponse.add(wordsFound.get(i));
-                                                        unsimplifiedResponse.add(wordsFound.get(i));
-                                                    }
-                                                }
-
-                                                //findResponse(cleanResponse);
-                                                lemmatization();
-
-
-                                            }
-                                        }
-                                    });
-
-                            /*
-                            db.collection("white list").get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                                    whiteList.add(document.get("word").toString());
-                                                }
-
-                                                for (int i = 0; i < wordsFound.size(); i++) {
-
-                                                    if (whiteList.contains(wordsFound.get(i)) == true) {
-                                                        importantWords.add(wordsFound.get(i));
-                                                    }
-                                                }
-
-                                                findResponse(importantWords, chatRecyclerView);
-
-                                            }
-                                        }
-                        });*
-                        }
-                                }});
-
-
-
-
-        db.collection("meanings").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-                                baseMeaning wordSimplifiesTo = document.toObject(baseMeaning.class);
-                                simplifications.add(wordSimplifiesTo);
-
-                            }
-
-                            List<String> responseWithMeaning = new ArrayList<String>();
-                            String meaning = "";
-
-                            for (int i = 0; i < unsimplifiedResponse.size(); i++) {
-
-
-                                for (int it = 0; it < simplifications.size(); it++)
-                                {
-                                    for(int iter = 0; iter < simplifications.get(it).getWords().size(); iter++)
-                                    {
-
-                                        if (unsimplifiedResponse.get(i).toString().equals(simplifications.get(it).getWords().get(iter).toString()))
-                                        {
-                                            meaning = simplifications.get(it).getMeaning();
-                                            break;
-                                        }
-                                        else
-                                        {
-
-                                        }
-                                    }
-
-                                }
-
-                                if (meaning.equals(""))
-                                {
-                                    meaning = unsimplifiedResponse.get(i).toString();
-                                }
-
-                                responseWithMeaning.add(meaning);
-                            }
-
-                            for (int test = 0; test < unsimplifiedResponse.size(); test++)
-                            {
-                                Log.d("WORD MEANING", ""+ unsimplifiedResponse.get(test) + " means " + responseWithMeaning.get(test));
-                            }
-
-
-                            //findResponse(cleanResponse);
-
-                        }
-                    }
-                });
-
-
-
- */

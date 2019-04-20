@@ -30,7 +30,7 @@ public class voiceUI {
 
                 if (status != TextToSpeech.ERROR)
                 {
-                    //t2s.setLanguage(Locale.getDefault());
+
                 }
 
             }

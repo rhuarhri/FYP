@@ -63,7 +63,6 @@ public class unKnownResponseHandler {
         historyManager = HistoryManager;
         suggestedResponses = SuggestedResponses;
 
-        //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
 
         userAttempts++;
 
@@ -114,8 +113,6 @@ public class unKnownResponseHandler {
 
     private void getFallBackResponse()
     {
-
-        //Log.d("SIZE", ""+ documentHistory.getDocumentHistory().size());
 
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
